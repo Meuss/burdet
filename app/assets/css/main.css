@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply bg-paper font-serif text-ink antialiased;
+        font-feature-settings:
+            'liga' 1,
+            'kern' 1;
+    }
+
+    ::selection {
+        @apply bg-gold/30 text-ink;
+    }
+}
+
+@layer components {
+    .section-title {
+        @apply font-serif text-3xl font-light uppercase tracking-widest text-gold md:text-4xl;
+    }
+
+    .eyebrow {
+        @apply font-sans text-xs font-medium uppercase tracking-widest text-gold;
+    }
+
+    .rule {
+        @apply mx-auto h-px w-24 bg-gold/70;
+    }
+}
