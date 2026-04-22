@@ -7,15 +7,15 @@
             </div>
 
             <div class="space-y-6 font-serif text-lg leading-relaxed text-ink md:text-xl">
-                <p>Et nous avons tellement hâte de vivre ce grand jour entourés de ceux que nous aimons.</p>
+                <p>Nous sommes heureux de vous convier à notre mariage qui aura lieu le</p>
+                <p class="font-serif text-2xl text-gold md:text-3xl">samedi 18 juillet 2026</p>
+                <p>14h00</p>
                 <p>
-                    Rendez-vous le <strong class="font-medium">samedi 18 juillet 2026 à Fribourg</strong> pour une
-                    journée pleine d&rsquo;émotions, de sourires et de fête&nbsp;!
+                    Église Saint-Jean<br />
+                    Planche supérieure 9<br />
+                    1700 Fribourg
                 </p>
-                <p>
-                    Sur ce site, vous trouverez toutes les infos nécessaires pour préparer au mieux votre venue. Merci
-                    d&rsquo;être à nos côtés pour cette belle aventure.
-                </p>
+                <p>Merci d&rsquo;être à nos côtés pour cette belle aventure.</p>
                 <p class="font-display text-3xl text-gold md:text-4xl">
                     On compte sur vous pour mettre l&rsquo;ambiance&nbsp;!
                 </p>

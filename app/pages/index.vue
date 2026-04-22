@@ -5,7 +5,6 @@
         <SectionIntro />
         <SectionProgramme />
         <SectionInfos />
-        <SectionContacts />
         <RsvpForm />
         <SectionFooter />
     </main>

@@ -42,13 +42,13 @@ Have a look at the pictures in the `infos/` directory: there is the invitation t
 
 - Nom et prénom (required)
 - Nom et prénom de l'accompagnant·e (optional)
-- Adresse, ville, code postal (required)
+- Adresse (required)
+- Localité (required)
 - Téléphone (required)
-- Email (optional)
-- Je souhaite bénéficier du transport entre la cérémonie et la réception (oui / non — required)
-- Je pense contacter le taxi pour mon retour mais ne m'engage à rien (oui / non — required)
-- Je me débrouille pour les déplacements (oui / non — required)
+- Adresse e-mail (optional)
+- Enfants : nombre (optional, numeric)
 - Restrictions alimentaires (free text)
+- Déplacement avec votre propre véhicule ? (oui / non — required)
 - Message pour les mariés (optional)
 - Honeypot field (hidden, must be empty on submit)
 

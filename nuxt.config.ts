@@ -17,6 +17,7 @@ export default defineNuxtConfig({
             meta: [
                 { charset: 'utf-8' },
                 { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+                { name: 'theme-color', content: '#c49b3d' },
                 {
                     name: 'description',
                     content:
@@ -28,8 +29,24 @@ export default defineNuxtConfig({
                     content: 'Mariage de Stéphanie et Jérémy le 18 juillet 2026 à Fribourg.',
                 },
                 { property: 'og:type', content: 'website' },
+                { property: 'og:url', content: 'https://stephanie-jeremy.ch/' },
+                { property: 'og:image', content: 'https://stephanie-jeremy.ch/og-image.png' },
+                { property: 'og:image:width', content: '1200' },
+                { property: 'og:image:height', content: '630' },
+                { property: 'og:image:alt', content: 'Stéphanie & Jérémy — 18 juillet 2026 à Fribourg' },
+                { property: 'og:locale', content: 'fr_CH' },
+                { name: 'twitter:card', content: 'summary_large_image' },
+                { name: 'twitter:title', content: 'Stéphanie & Jérémy — 18 juillet 2026' },
+                {
+                    name: 'twitter:description',
+                    content: 'Mariage de Stéphanie et Jérémy le 18 juillet 2026 à Fribourg.',
+                },
+                { name: 'twitter:image', content: 'https://stephanie-jeremy.ch/og-image.png' },
             ],
             link: [
+                { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+                { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico', sizes: '16x16 32x32 48x48' },
+                { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
                 { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
                 { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
                 {

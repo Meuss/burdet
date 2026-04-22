@@ -6,12 +6,12 @@ interface RsvpPayload {
     fullName: string;
     plusOne: string;
     address: string;
+    locality: string;
     phone: string;
     email: string;
-    transportBus: string;
-    transportTaxi: string;
-    transportSelf: string;
+    childrenCount: string;
     dietary: string;
+    ownVehicle: string;
     message: string;
     website: string;
 }
@@ -21,18 +21,19 @@ interface ParsedPayload extends RsvpPayload {
     submittedAt: string;
 }
 
+// If you reorder/add columns here, update the sheet header row in the Google Sheet by hand.
 const SHEET_COLUMNS: Array<keyof ParsedPayload | 'submittedAt' | 'submissionId'> = [
     'submittedAt',
     'submissionId',
     'fullName',
     'plusOne',
     'address',
+    'locality',
     'phone',
     'email',
-    'transportBus',
-    'transportTaxi',
-    'transportSelf',
+    'childrenCount',
     'dietary',
+    'ownVehicle',
     'message',
 ];
 
@@ -51,12 +52,12 @@ function parsePayload(raw: unknown): RsvpPayload | null {
         fullName: str(r.fullName),
         plusOne: str(r.plusOne),
         address: str(r.address),
+        locality: str(r.locality),
         phone: str(r.phone),
         email: str(r.email),
-        transportBus: str(r.transportBus),
-        transportTaxi: str(r.transportTaxi),
-        transportSelf: str(r.transportSelf),
+        childrenCount: str(r.childrenCount),
         dietary: str(r.dietary),
+        ownVehicle: str(r.ownVehicle),
         message: str(r.message),
         website: str(r.website),
     };
@@ -65,12 +66,12 @@ function parsePayload(raw: unknown): RsvpPayload | null {
 function validate(p: RsvpPayload): string | null {
     if (!p.fullName) return 'Nom et prénom manquants.';
     if (!p.address) return 'Adresse manquante.';
+    if (!p.locality) return 'Localité manquante.';
     if (!p.phone) return 'Téléphone manquant.';
     const yn = new Set(['oui', 'non']);
-    if (!yn.has(p.transportBus)) return 'Réponse transport bus manquante.';
-    if (!yn.has(p.transportTaxi)) return 'Réponse taxi manquante.';
-    if (!yn.has(p.transportSelf)) return 'Réponse trajet personnel manquante.';
+    if (!yn.has(p.ownVehicle)) return 'Réponse propre véhicule manquante.';
     if (p.email && !/^\S+@\S+\.\S+$/.test(p.email)) return 'E-mail invalide.';
+    if (p.childrenCount && !/^\d+$/.test(p.childrenCount)) return 'Nombre d’enfants invalide.';
     return null;
 }
 
@@ -106,12 +107,12 @@ function formatEmailBody(p: ParsedPayload): { text: string; html: string } {
         ['Nom et prénom', p.fullName],
         ['Accompagnant·e', p.plusOne || '—'],
         ['Adresse', p.address],
+        ['Localité', p.locality],
         ['Téléphone', p.phone],
         ['E-mail', p.email || '—'],
-        ['Transport bus (cérémonie → réception)', p.transportBus],
-        ['Taxi retour envisagé', p.transportTaxi],
-        ['Se débrouille seul·e', p.transportSelf],
+        ['Enfants (nombre)', p.childrenCount || '—'],
         ['Restrictions alimentaires', p.dietary || '—'],
+        ['Propre véhicule', p.ownVehicle],
         ['Message', p.message || '—'],
         ['Submission ID', p.submissionId],
         ['Reçu le', p.submittedAt],
@@ -120,7 +121,7 @@ function formatEmailBody(p: ParsedPayload): { text: string; html: string } {
     const text = rows.map(([k, v]) => `${k}: ${v}`).join('\n');
 
     const html = `<!doctype html><html><body style="font-family:Georgia,serif;color:#111;line-height:1.5">
-<h2 style="color:#b08a3e;font-family:Georgia,serif">Nouvelle réponse RSVP</h2>
+<h2 style="color:#c49b3d;font-family:Georgia,serif">Nouvelle réponse RSVP</h2>
 <table cellpadding="6" cellspacing="0" style="border-collapse:collapse">
 ${rows
     .map(
@@ -156,9 +157,12 @@ async function sendEmail(p: ParsedPayload): Promise<void> {
         .filter(Boolean);
 
     const resend = new Resend(apiKey);
-    const status =
-        `${p.transportBus === 'oui' ? 'transfert bus' : ''}${p.transportTaxi === 'oui' ? ' · taxi retour' : ''}${p.transportSelf === 'oui' ? ' · se débrouille' : ''}`.trim();
-    const subject = `RSVP — ${p.fullName}${p.plusOne ? ` (+ ${p.plusOne})` : ''}${status ? ` [${status}]` : ''}`;
+    const statusBits: string[] = [];
+    if (p.ownVehicle === 'oui') statusBits.push('véhicule perso');
+    if (p.ownVehicle === 'non') statusBits.push('sans véhicule');
+    if (p.childrenCount && Number(p.childrenCount) > 0) statusBits.push(`${p.childrenCount} enfant(s)`);
+    const statusTag = statusBits.join(' · ');
+    const subject = `RSVP — ${p.fullName}${p.plusOne ? ` (+ ${p.plusOne})` : ''}${statusTag ? ` [${statusTag}]` : ''}`;
     const { text, html } = formatEmailBody(p);
 
     const result = await resend.emails.send({ from, to, subject, text, html });
@@ -173,12 +177,12 @@ async function captureToNetlifyForms(p: ParsedPayload, siteUrl: string): Promise
         fullName: p.fullName,
         plusOne: p.plusOne,
         address: p.address,
+        locality: p.locality,
         phone: p.phone,
         email: p.email,
-        transportBus: p.transportBus,
-        transportTaxi: p.transportTaxi,
-        transportSelf: p.transportSelf,
+        childrenCount: p.childrenCount,
         dietary: p.dietary,
+        ownVehicle: p.ownVehicle,
         message: p.message,
         submissionId: p.submissionId,
         submittedAt: p.submittedAt,

@@ -7,12 +7,12 @@ interface FormState {
     fullName: string;
     plusOne: string;
     address: string;
+    locality: string;
     phone: string;
     email: string;
-    transportBus: YesNo;
-    transportTaxi: YesNo;
-    transportSelf: YesNo;
+    childrenCount: string;
     dietary: string;
+    ownVehicle: YesNo;
     message: string;
     // honeypot
     website: string;
@@ -22,12 +22,12 @@ const form = reactive<FormState>({
     fullName: '',
     plusOne: '',
     address: '',
+    locality: '',
     phone: '',
     email: '',
-    transportBus: '',
-    transportTaxi: '',
-    transportSelf: '',
+    childrenCount: '',
     dietary: '',
+    ownVehicle: '',
     message: '',
     website: '',
 });
@@ -48,13 +48,15 @@ function encodeForNetlify(data: Record<string, string>): string {
 function validate(): boolean {
     const errors: Record<string, string> = {};
     if (!form.fullName.trim()) errors.fullName = 'Merci d’indiquer votre nom et prénom.';
-    if (!form.address.trim()) errors.address = 'Merci d’indiquer votre adresse complète.';
+    if (!form.address.trim()) errors.address = 'Merci d’indiquer votre adresse.';
+    if (!form.locality.trim()) errors.locality = 'Merci d’indiquer votre localité.';
     if (!form.phone.trim()) errors.phone = 'Merci d’indiquer un numéro de téléphone.';
-    if (!form.transportBus) errors.transportBus = 'Merci de répondre.';
-    if (!form.transportTaxi) errors.transportTaxi = 'Merci de répondre.';
-    if (!form.transportSelf) errors.transportSelf = 'Merci de répondre.';
+    if (!form.ownVehicle) errors.ownVehicle = 'Merci de répondre.';
     if (form.email && !/^\S+@\S+\.\S+$/.test(form.email)) {
         errors.email = 'Adresse e-mail invalide.';
+    }
+    if (form.childrenCount && !/^\d+$/.test(form.childrenCount.trim())) {
+        errors.childrenCount = 'Merci d’indiquer un nombre.';
     }
     validationErrors.value = errors;
     return Object.keys(errors).length === 0;
@@ -70,12 +72,12 @@ async function onSubmit() {
         fullName: form.fullName.trim(),
         plusOne: form.plusOne.trim(),
         address: form.address.trim(),
+        locality: form.locality.trim(),
         phone: form.phone.trim(),
         email: form.email.trim(),
-        transportBus: form.transportBus,
-        transportTaxi: form.transportTaxi,
-        transportSelf: form.transportSelf,
+        childrenCount: form.childrenCount.trim(),
         dietary: form.dietary.trim(),
+        ownVehicle: form.ownVehicle,
         message: form.message.trim(),
         website: form.website,
     };
@@ -114,7 +116,7 @@ async function onSubmit() {
     <section id="rsvp" class="px-6 py-20 md:py-28">
         <div class="mx-auto max-w-2xl">
             <div class="text-center">
-                <h2 class="section-title">Confirmer ma présence</h2>
+                <h2 class="section-title">Inscription</h2>
                 <div class="mb-10 mt-6 flex justify-center">
                     <div class="rule"></div>
                 </div>
@@ -170,19 +172,37 @@ async function onSubmit() {
                     </div>
 
                     <div class="md:col-span-2">
-                        <label class="eyebrow block" for="address">Adresse, ville, code postal *</label>
-                        <textarea
+                        <label class="eyebrow block" for="address">Adresse *</label>
+                        <input
                             id="address"
                             v-model="form.address"
-                            rows="2"
+                            type="text"
                             autocomplete="street-address"
                             required
-                            class="mt-2 w-full resize-none border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 transition-colors duration-150 ease-out focus:border-gold focus:outline-none"
+                            class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 transition-colors duration-150 ease-out focus:border-gold focus:outline-none"
                             :class="{ 'border-red-600': validationErrors.address }"
-                        ></textarea>
+                        />
                         <Transition name="error">
                             <p v-if="validationErrors.address" class="mt-1 text-sm text-red-700">
                                 {{ validationErrors.address }}
+                            </p>
+                        </Transition>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="eyebrow block" for="locality">Localité *</label>
+                        <input
+                            id="locality"
+                            v-model="form.locality"
+                            type="text"
+                            autocomplete="address-level2"
+                            required
+                            class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 transition-colors duration-150 ease-out focus:border-gold focus:outline-none"
+                            :class="{ 'border-red-600': validationErrors.locality }"
+                        />
+                        <Transition name="error">
+                            <p v-if="validationErrors.locality" class="mt-1 text-sm text-red-700">
+                                {{ validationErrors.locality }}
                             </p>
                         </Transition>
                     </div>
@@ -206,7 +226,7 @@ async function onSubmit() {
                     </div>
 
                     <div>
-                        <label class="eyebrow block" for="email">E-mail</label>
+                        <label class="eyebrow block" for="email">Adresse e-mail</label>
                         <input
                             id="email"
                             v-model="form.email"
@@ -221,30 +241,25 @@ async function onSubmit() {
                             </p>
                         </Transition>
                     </div>
+
+                    <div class="md:col-span-2">
+                        <label class="eyebrow block" for="childrenCount">Enfants&nbsp;: nombre&nbsp;?</label>
+                        <input
+                            id="childrenCount"
+                            v-model="form.childrenCount"
+                            type="number"
+                            min="0"
+                            inputmode="numeric"
+                            class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 transition-colors duration-150 ease-out focus:border-gold focus:outline-none"
+                            :class="{ 'border-red-600': validationErrors.childrenCount }"
+                        />
+                        <Transition name="error">
+                            <p v-if="validationErrors.childrenCount" class="mt-1 text-sm text-red-700">
+                                {{ validationErrors.childrenCount }}
+                            </p>
+                        </Transition>
+                    </div>
                 </div>
-
-                <fieldset class="space-y-6 border-t border-gold/30 pt-8">
-                    <legend class="eyebrow">Transports</legend>
-
-                    <RsvpYesNo
-                        v-model="form.transportBus"
-                        name="transportBus"
-                        label="Je souhaite bénéficier du transport entre la cérémonie et la réception *"
-                        :error="validationErrors.transportBus"
-                    />
-                    <RsvpYesNo
-                        v-model="form.transportTaxi"
-                        name="transportTaxi"
-                        label="Je pense contacter le taxi pour mon retour (ne m’engage à rien) *"
-                        :error="validationErrors.transportTaxi"
-                    />
-                    <RsvpYesNo
-                        v-model="form.transportSelf"
-                        name="transportSelf"
-                        label="Je me débrouille pour les déplacements *"
-                        :error="validationErrors.transportSelf"
-                    />
-                </fieldset>
 
                 <div class="border-t border-gold/30 pt-8">
                     <label class="eyebrow block" for="dietary">Restrictions alimentaires</label>
@@ -255,6 +270,15 @@ async function onSubmit() {
                         placeholder="Allergies, régime particulier…"
                         class="mt-2 w-full resize-none border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 transition-colors duration-150 ease-out focus:border-gold focus:outline-none"
                     ></textarea>
+                </div>
+
+                <div class="border-t border-gold/30 pt-8">
+                    <RsvpYesNo
+                        v-model="form.ownVehicle"
+                        name="ownVehicle"
+                        label="Déplacement avec votre propre véhicule ? *"
+                        :error="validationErrors.ownVehicle"
+                    />
                 </div>
 
                 <div>

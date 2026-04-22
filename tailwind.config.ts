@@ -6,9 +6,9 @@ export default {
         extend: {
             colors: {
                 gold: {
-                    DEFAULT: '#b08a3e',
-                    dark: '#8c6a28',
-                    light: '#d4b878',
+                    DEFAULT: '#c49b3d',
+                    dark: '#9a7729',
+                    light: '#e0c580',
                 },
                 ink: '#111111',
                 paper: '#ffffff',
