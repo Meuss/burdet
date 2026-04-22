@@ -123,14 +123,15 @@ async function onSubmit() {
                 </p>
             </div>
 
-            <div v-if="status === 'success'" class="mt-12 border border-gold/40 bg-[#fafaf7] p-10 text-center">
+            <Transition name="swap" mode="out-in">
+            <div v-if="status === 'success'" key="success" class="mt-12 border border-gold/40 bg-[#fafaf7] p-10 text-center">
                 <p class="font-display text-4xl text-gold">Merci&nbsp;!</p>
                 <p class="mt-4 font-serif text-lg text-ink/80">
                     Votre réponse a bien été enregistrée. Nous avons hâte de célébrer ce moment avec vous.
                 </p>
             </div>
 
-            <form v-else class="mt-12 space-y-8" novalidate @submit.prevent="onSubmit">
+            <form v-else key="form" class="mt-12 space-y-8" novalidate @submit.prevent="onSubmit">
                 <!-- Honeypot -->
                 <div class="hidden" aria-hidden="true">
                     <label>
@@ -148,12 +149,14 @@ async function onSubmit() {
                             type="text"
                             autocomplete="name"
                             required
-                            class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 focus:border-gold focus:outline-none"
+                            class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 transition-colors duration-150 ease-out focus:border-gold focus:outline-none"
                             :class="{ 'border-red-600': validationErrors.fullName }"
                         />
-                        <p v-if="validationErrors.fullName" class="mt-1 text-sm text-red-700">
-                            {{ validationErrors.fullName }}
-                        </p>
+                        <Transition name="error">
+                            <p v-if="validationErrors.fullName" class="mt-1 text-sm text-red-700">
+                                {{ validationErrors.fullName }}
+                            </p>
+                        </Transition>
                     </div>
 
                     <div class="md:col-span-2">
@@ -162,7 +165,7 @@ async function onSubmit() {
                             id="plusOne"
                             v-model="form.plusOne"
                             type="text"
-                            class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 focus:border-gold focus:outline-none"
+                            class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 transition-colors duration-150 ease-out focus:border-gold focus:outline-none"
                         />
                     </div>
 
@@ -174,12 +177,14 @@ async function onSubmit() {
                             rows="2"
                             autocomplete="street-address"
                             required
-                            class="mt-2 w-full resize-none border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 focus:border-gold focus:outline-none"
+                            class="mt-2 w-full resize-none border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 transition-colors duration-150 ease-out focus:border-gold focus:outline-none"
                             :class="{ 'border-red-600': validationErrors.address }"
                         ></textarea>
-                        <p v-if="validationErrors.address" class="mt-1 text-sm text-red-700">
-                            {{ validationErrors.address }}
-                        </p>
+                        <Transition name="error">
+                            <p v-if="validationErrors.address" class="mt-1 text-sm text-red-700">
+                                {{ validationErrors.address }}
+                            </p>
+                        </Transition>
                     </div>
 
                     <div>
@@ -190,12 +195,14 @@ async function onSubmit() {
                             type="tel"
                             autocomplete="tel"
                             required
-                            class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 focus:border-gold focus:outline-none"
+                            class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 transition-colors duration-150 ease-out focus:border-gold focus:outline-none"
                             :class="{ 'border-red-600': validationErrors.phone }"
                         />
-                        <p v-if="validationErrors.phone" class="mt-1 text-sm text-red-700">
-                            {{ validationErrors.phone }}
-                        </p>
+                        <Transition name="error">
+                            <p v-if="validationErrors.phone" class="mt-1 text-sm text-red-700">
+                                {{ validationErrors.phone }}
+                            </p>
+                        </Transition>
                     </div>
 
                     <div>
@@ -205,12 +212,14 @@ async function onSubmit() {
                             v-model="form.email"
                             type="email"
                             autocomplete="email"
-                            class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 focus:border-gold focus:outline-none"
+                            class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 transition-colors duration-150 ease-out focus:border-gold focus:outline-none"
                             :class="{ 'border-red-600': validationErrors.email }"
                         />
-                        <p v-if="validationErrors.email" class="mt-1 text-sm text-red-700">
-                            {{ validationErrors.email }}
-                        </p>
+                        <Transition name="error">
+                            <p v-if="validationErrors.email" class="mt-1 text-sm text-red-700">
+                                {{ validationErrors.email }}
+                            </p>
+                        </Transition>
                     </div>
                 </div>
 
@@ -244,7 +253,7 @@ async function onSubmit() {
                         v-model="form.dietary"
                         rows="2"
                         placeholder="Allergies, régime particulier…"
-                        class="mt-2 w-full resize-none border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 focus:border-gold focus:outline-none"
+                        class="mt-2 w-full resize-none border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 transition-colors duration-150 ease-out focus:border-gold focus:outline-none"
                     ></textarea>
                 </div>
 
@@ -254,24 +263,78 @@ async function onSubmit() {
                         id="message"
                         v-model="form.message"
                         rows="4"
-                        class="mt-2 w-full resize-none border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 focus:border-gold focus:outline-none"
+                        class="mt-2 w-full resize-none border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 transition-colors duration-150 ease-out focus:border-gold focus:outline-none"
                     ></textarea>
                 </div>
 
-                <p v-if="status === 'error'" class="text-center font-serif text-base text-red-700">
-                    {{ errorMessage }}
-                </p>
+                <Transition name="error">
+                    <p v-if="status === 'error'" class="text-center font-serif text-base text-red-700">
+                        {{ errorMessage }}
+                    </p>
+                </Transition>
 
                 <div class="flex justify-center pt-4">
                     <button
                         type="submit"
                         :disabled="isSubmitting"
-                        class="inline-flex items-center justify-center border border-gold bg-gold px-10 py-3 font-sans text-xs uppercase tracking-widest text-paper transition-colors hover:bg-gold-dark disabled:cursor-not-allowed disabled:opacity-60"
+                        class="inline-flex items-center justify-center border border-gold bg-gold px-10 py-3 font-sans text-xs uppercase tracking-widest text-paper transition duration-200 ease-emph-out hover:bg-gold-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
                     >
                         {{ isSubmitting ? 'Envoi…' : 'Envoyer ma réponse' }}
                     </button>
                 </div>
             </form>
+            </Transition>
         </div>
     </section>
 </template>
+
+<style scoped>
+.swap-enter-active {
+    transition:
+        opacity 260ms cubic-bezier(0.23, 1, 0.32, 1),
+        transform 260ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.swap-leave-active {
+    transition:
+        opacity 160ms cubic-bezier(0.23, 1, 0.32, 1),
+        transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.swap-enter-from {
+    opacity: 0;
+    transform: scale(0.97);
+}
+.swap-leave-to {
+    opacity: 0;
+    transform: scale(0.98);
+}
+
+.error-enter-active {
+    transition:
+        opacity 180ms cubic-bezier(0.23, 1, 0.32, 1),
+        transform 180ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.error-leave-active {
+    transition: opacity 120ms ease-out;
+}
+.error-enter-from {
+    opacity: 0;
+    transform: translateY(-4px);
+}
+.error-leave-to {
+    opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .swap-enter-active,
+    .swap-leave-active,
+    .error-enter-active,
+    .error-leave-active {
+        transition-duration: 120ms;
+    }
+    .swap-enter-from,
+    .swap-leave-to,
+    .error-enter-from {
+        transform: none;
+    }
+}
+</style>

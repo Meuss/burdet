@@ -22,7 +22,7 @@
 
         <a
             href="#rsvp"
-            class="mt-16 inline-block border border-gold px-8 py-3 font-sans text-xs uppercase tracking-widest text-gold transition-colors hover:bg-gold hover:text-paper"
+            class="mt-16 inline-block border border-gold px-8 py-3 font-sans text-xs uppercase tracking-widest text-gold transition duration-200 ease-emph-out hover:bg-gold hover:text-paper active:scale-[0.97]"
         >
             Confirmer ma présence
         </a>

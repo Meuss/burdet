@@ -20,7 +20,7 @@ defineEmits<{
             <label
                 v-for="option in ['oui', 'non'] as const"
                 :key="option"
-                class="flex-1 cursor-pointer border border-ink/20 px-4 py-3 text-center font-sans text-xs uppercase tracking-widest transition-colors"
+                class="flex-1 cursor-pointer border border-ink/20 px-4 py-3 text-center font-sans text-xs uppercase tracking-widest transition duration-150 ease-emph-out focus-within:border-gold focus-within:ring-1 focus-within:ring-gold/40 active:scale-[0.98]"
                 :class="
                     modelValue === option
                         ? 'border-gold bg-gold text-paper'
@@ -38,6 +38,36 @@ defineEmits<{
                 {{ option }}
             </label>
         </div>
-        <p v-if="error" class="mt-1 text-sm text-red-700">{{ error }}</p>
+        <Transition name="error">
+            <p v-if="error" class="mt-1 text-sm text-red-700">{{ error }}</p>
+        </Transition>
     </div>
 </template>
+
+<style scoped>
+.error-enter-active {
+    transition:
+        opacity 180ms cubic-bezier(0.23, 1, 0.32, 1),
+        transform 180ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.error-leave-active {
+    transition: opacity 120ms ease-out;
+}
+.error-enter-from {
+    opacity: 0;
+    transform: translateY(-4px);
+}
+.error-leave-to {
+    opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .error-enter-active,
+    .error-leave-active {
+        transition-duration: 120ms;
+    }
+    .error-enter-from {
+        transform: none;
+    }
+}
+</style>
