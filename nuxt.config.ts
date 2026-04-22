@@ -18,6 +18,7 @@ export default defineNuxtConfig({
                 { charset: 'utf-8' },
                 { name: 'viewport', content: 'width=device-width, initial-scale=1' },
                 { name: 'theme-color', content: '#c49b3d' },
+                { name: 'robots', content: 'noindex, nofollow' },
                 {
                     name: 'description',
                     content:
