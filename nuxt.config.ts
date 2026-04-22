@@ -11,9 +11,6 @@ export default defineNuxtConfig({
         preset: 'static',
     },
     app: {
-        // Read at build time. Defaults to '/'; set to '/burdet/' in the
-        // GitHub Pages workflow so assets resolve on the project subpath.
-        baseURL: process.env.NUXT_APP_BASE_URL ?? '/',
         head: {
             htmlAttrs: { lang: 'fr' },
             title: 'Stéphanie & Jérémy — 18 juillet 2026',
