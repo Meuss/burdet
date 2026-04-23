@@ -171,34 +171,7 @@ async function sendEmail(p: ParsedPayload): Promise<void> {
     }
 }
 
-async function captureToNetlifyForms(p: ParsedPayload, siteUrl: string): Promise<void> {
-    const body = new URLSearchParams({
-        'form-name': 'rsvp',
-        fullName: p.fullName,
-        plusOne: p.plusOne,
-        address: p.address,
-        locality: p.locality,
-        phone: p.phone,
-        email: p.email,
-        childrenCount: p.childrenCount,
-        dietary: p.dietary,
-        ownVehicle: p.ownVehicle,
-        message: p.message,
-        submissionId: p.submissionId,
-        submittedAt: p.submittedAt,
-    });
-
-    const res = await fetch(siteUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: body.toString(),
-    });
-    if (!res.ok) {
-        throw new Error(`Netlify Forms capture returned ${res.status}`);
-    }
-}
-
-export default async (req: Request, context: Context): Promise<Response> => {
+export default async (req: Request, _context: Context): Promise<Response> => {
     if (req.method !== 'POST') {
         return jsonResponse(405, { message: 'Method not allowed' });
     }
@@ -229,26 +202,18 @@ export default async (req: Request, context: Context): Promise<Response> => {
         submittedAt: new Date().toISOString(),
     };
 
-    const siteUrl = context.site.url ?? `https://${req.headers.get('host')}`;
+    const results = await Promise.allSettled([appendToSheet(enriched), sendEmail(enriched)]);
 
-    const results = await Promise.allSettled([
-        appendToSheet(enriched),
-        sendEmail(enriched),
-        captureToNetlifyForms(enriched, siteUrl),
-    ]);
+    const [sheetResult, emailResult] = results;
 
-    const [sheetResult, emailResult, netlifyResult] = results;
-
-    const log = {
+    console.log('rsvp submission', {
         submissionId: enriched.submissionId,
         sheet: sheetResult.status,
         email: emailResult.status,
-        netlifyForms: netlifyResult.status,
-    };
-    console.log('rsvp submission', log);
+    });
     results.forEach((r, i) => {
         if (r.status === 'rejected') {
-            console.error(`rsvp sink ${['sheet', 'email', 'netlifyForms'][i]} failed`, r.reason);
+            console.error(`rsvp sink ${['sheet', 'email'][i]} failed`, r.reason);
         }
     });
 
