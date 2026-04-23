@@ -247,8 +247,7 @@ async function onSubmit() {
                         <input
                             id="childrenCount"
                             v-model="form.childrenCount"
-                            type="number"
-                            min="0"
+                            type="text"
                             inputmode="numeric"
                             class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 transition-colors duration-150 ease-out focus:border-gold focus:outline-none"
                             :class="{ 'border-red-600': validationErrors.childrenCount }"
