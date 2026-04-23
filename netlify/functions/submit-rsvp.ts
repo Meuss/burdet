@@ -91,7 +91,7 @@ async function appendToSheet(p: ParsedPayload): Promise<void> {
     });
     const sheets = google.sheets({ version: 'v4', auth });
 
-    const row = SHEET_COLUMNS.map((key) => (p as Record<string, string>)[key] ?? '');
+    const row = SHEET_COLUMNS.map((key) => (p as unknown as Record<string, string>)[key] ?? '');
 
     await sheets.spreadsheets.values.append({
         spreadsheetId: sheetId,
