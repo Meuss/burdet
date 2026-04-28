@@ -140,8 +140,8 @@ function escapeHtml(s: string): string {
 
 async function sendEmail(p: ParsedPayload): Promise<void> {
     const apiKey = process.env.RESEND_API_KEY;
-    const from = process.env.RESEND_FROM_ADDRESS;
-    const recipients = process.env.NOTIFICATION_RECIPIENTS;
+    const from = 'no-reply@stephanie-jeremy.ch';
+    const recipients = 'thomas.miller147@gmail.com';
     if (!apiKey || !from || !recipients) {
         throw new Error('Resend credentials not configured');
     }
