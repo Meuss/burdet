@@ -4,7 +4,6 @@
         <input type="text" name="plusOne" />
         <input type="text" name="address" />
         <input type="text" name="locality" />
-        <input type="tel" name="phone" />
         <input type="email" name="email" />
         <input type="number" name="childrenCount" />
         <textarea name="dietary"></textarea>

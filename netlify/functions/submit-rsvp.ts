@@ -7,7 +7,6 @@ interface RsvpPayload {
     plusOne: string;
     address: string;
     locality: string;
-    phone: string;
     email: string;
     childrenCount: string;
     dietary: string;
@@ -29,7 +28,6 @@ const SHEET_COLUMNS: Array<keyof ParsedPayload | 'submittedAt' | 'submissionId'>
     'plusOne',
     'address',
     'locality',
-    'phone',
     'email',
     'childrenCount',
     'dietary',
@@ -53,7 +51,6 @@ function parsePayload(raw: unknown): RsvpPayload | null {
         plusOne: str(r.plusOne),
         address: str(r.address),
         locality: str(r.locality),
-        phone: str(r.phone),
         email: str(r.email),
         childrenCount: str(r.childrenCount),
         dietary: str(r.dietary),
@@ -67,7 +64,6 @@ function validate(p: RsvpPayload): string | null {
     if (!p.fullName) return 'Nom et prénom manquants.';
     if (!p.address) return 'Adresse manquante.';
     if (!p.locality) return 'Localité manquante.';
-    if (!p.phone) return 'Téléphone manquant.';
     const yn = new Set(['oui', 'non']);
     if (!yn.has(p.ownVehicle)) return 'Réponse propre véhicule manquante.';
     if (p.email && !/^\S+@\S+\.\S+$/.test(p.email)) return 'E-mail invalide.';
@@ -108,7 +104,6 @@ function formatEmailBody(p: ParsedPayload): { text: string; html: string } {
         ['Accompagnant·e', p.plusOne || '—'],
         ['Adresse', p.address],
         ['Localité', p.locality],
-        ['Téléphone', p.phone],
         ['E-mail', p.email || '—'],
         ['Enfants (nombre)', p.childrenCount || '—'],
         ['Restrictions alimentaires', p.dietary || '—'],

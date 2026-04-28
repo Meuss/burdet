@@ -44,7 +44,6 @@ Have a look at the pictures in the `infos/` directory: there is the invitation t
 - Nom et prénom de l'accompagnant·e (optional)
 - Adresse (required)
 - Localité (required)
-- Téléphone (required)
 - Adresse e-mail (optional)
 - Enfants : nombre (optional, numeric)
 - Restrictions alimentaires (free text)

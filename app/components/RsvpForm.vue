@@ -8,7 +8,6 @@ interface FormState {
     plusOne: string;
     address: string;
     locality: string;
-    phone: string;
     email: string;
     childrenCount: string;
     dietary: string;
@@ -23,7 +22,6 @@ const form = reactive<FormState>({
     plusOne: '',
     address: '',
     locality: '',
-    phone: '',
     email: '',
     childrenCount: '',
     dietary: '',
@@ -50,7 +48,6 @@ function validate(): boolean {
     if (!form.fullName.trim()) errors.fullName = 'Merci d’indiquer votre nom et prénom.';
     if (!form.address.trim()) errors.address = 'Merci d’indiquer votre adresse.';
     if (!form.locality.trim()) errors.locality = 'Merci d’indiquer votre localité.';
-    if (!form.phone.trim()) errors.phone = 'Merci d’indiquer un numéro de téléphone.';
     if (!form.ownVehicle) errors.ownVehicle = 'Merci de répondre.';
     if (form.email && !/^\S+@\S+\.\S+$/.test(form.email)) {
         errors.email = 'Adresse e-mail invalide.';
@@ -73,7 +70,6 @@ async function onSubmit() {
         plusOne: form.plusOne.trim(),
         address: form.address.trim(),
         locality: form.locality.trim(),
-        phone: form.phone.trim(),
         email: form.email.trim(),
         childrenCount: form.childrenCount.trim(),
         dietary: form.dietary.trim(),
@@ -121,191 +117,177 @@ async function onSubmit() {
                     <div class="rule"></div>
                 </div>
                 <p class="font-serif text-base leading-relaxed text-ink/80">
-                    Merci de remplir ce formulaire afin que nous puissions tout préparer pour vous accueillir.
+                    Merci de remplir ce formulaire pour confirmer votre participation.
                 </p>
             </div>
 
             <Transition name="swap" mode="out-in">
-            <div v-if="status === 'success'" key="success" class="mt-12 border border-gold/40 bg-[#fafaf7] p-10 text-center">
-                <p class="font-display text-4xl text-gold">Merci&nbsp;!</p>
-                <p class="mt-4 font-serif text-lg text-ink/80">
-                    Votre réponse a bien été enregistrée. Nous avons hâte de célébrer ce moment avec vous.
-                </p>
-            </div>
-
-            <form v-else key="form" class="mt-12 space-y-8" novalidate @submit.prevent="onSubmit">
-                <!-- Honeypot -->
-                <div class="hidden" aria-hidden="true">
-                    <label>
-                        Ne pas remplir
-                        <input v-model="form.website" type="text" name="website" tabindex="-1" autocomplete="off" />
-                    </label>
-                </div>
-
-                <div class="grid gap-6 md:grid-cols-2">
-                    <div class="md:col-span-2">
-                        <label class="eyebrow block" for="fullName">Nom et prénom *</label>
-                        <input
-                            id="fullName"
-                            v-model="form.fullName"
-                            type="text"
-                            autocomplete="name"
-                            required
-                            class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 transition-colors duration-150 ease-out focus:border-gold focus:outline-none"
-                            :class="{ 'border-red-600': validationErrors.fullName }"
-                        />
-                        <Transition name="error">
-                            <p v-if="validationErrors.fullName" class="mt-1 text-sm text-red-700">
-                                {{ validationErrors.fullName }}
-                            </p>
-                        </Transition>
-                    </div>
-
-                    <div class="md:col-span-2">
-                        <label class="eyebrow block" for="plusOne">Nom et prénom de l’accompagnant·e</label>
-                        <input
-                            id="plusOne"
-                            v-model="form.plusOne"
-                            type="text"
-                            class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 transition-colors duration-150 ease-out focus:border-gold focus:outline-none"
-                        />
-                    </div>
-
-                    <div class="md:col-span-2">
-                        <label class="eyebrow block" for="address">Adresse *</label>
-                        <input
-                            id="address"
-                            v-model="form.address"
-                            type="text"
-                            autocomplete="street-address"
-                            required
-                            class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 transition-colors duration-150 ease-out focus:border-gold focus:outline-none"
-                            :class="{ 'border-red-600': validationErrors.address }"
-                        />
-                        <Transition name="error">
-                            <p v-if="validationErrors.address" class="mt-1 text-sm text-red-700">
-                                {{ validationErrors.address }}
-                            </p>
-                        </Transition>
-                    </div>
-
-                    <div class="md:col-span-2">
-                        <label class="eyebrow block" for="locality">Localité *</label>
-                        <input
-                            id="locality"
-                            v-model="form.locality"
-                            type="text"
-                            autocomplete="address-level2"
-                            required
-                            class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 transition-colors duration-150 ease-out focus:border-gold focus:outline-none"
-                            :class="{ 'border-red-600': validationErrors.locality }"
-                        />
-                        <Transition name="error">
-                            <p v-if="validationErrors.locality" class="mt-1 text-sm text-red-700">
-                                {{ validationErrors.locality }}
-                            </p>
-                        </Transition>
-                    </div>
-
-                    <div>
-                        <label class="eyebrow block" for="phone">Téléphone *</label>
-                        <input
-                            id="phone"
-                            v-model="form.phone"
-                            type="tel"
-                            autocomplete="tel"
-                            required
-                            class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 transition-colors duration-150 ease-out focus:border-gold focus:outline-none"
-                            :class="{ 'border-red-600': validationErrors.phone }"
-                        />
-                        <Transition name="error">
-                            <p v-if="validationErrors.phone" class="mt-1 text-sm text-red-700">
-                                {{ validationErrors.phone }}
-                            </p>
-                        </Transition>
-                    </div>
-
-                    <div>
-                        <label class="eyebrow block" for="email">Adresse e-mail</label>
-                        <input
-                            id="email"
-                            v-model="form.email"
-                            type="email"
-                            autocomplete="email"
-                            class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 transition-colors duration-150 ease-out focus:border-gold focus:outline-none"
-                            :class="{ 'border-red-600': validationErrors.email }"
-                        />
-                        <Transition name="error">
-                            <p v-if="validationErrors.email" class="mt-1 text-sm text-red-700">
-                                {{ validationErrors.email }}
-                            </p>
-                        </Transition>
-                    </div>
-
-                    <div class="md:col-span-2">
-                        <label class="eyebrow block" for="childrenCount">Enfants&nbsp;: nombre&nbsp;?</label>
-                        <input
-                            id="childrenCount"
-                            v-model="form.childrenCount"
-                            type="text"
-                            inputmode="numeric"
-                            class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 transition-colors duration-150 ease-out focus:border-gold focus:outline-none"
-                            :class="{ 'border-red-600': validationErrors.childrenCount }"
-                        />
-                        <Transition name="error">
-                            <p v-if="validationErrors.childrenCount" class="mt-1 text-sm text-red-700">
-                                {{ validationErrors.childrenCount }}
-                            </p>
-                        </Transition>
-                    </div>
-                </div>
-
-                <div class="border-t border-gold/30 pt-8">
-                    <label class="eyebrow block" for="dietary">Restrictions alimentaires</label>
-                    <textarea
-                        id="dietary"
-                        v-model="form.dietary"
-                        rows="2"
-                        placeholder="Allergies, régime particulier…"
-                        class="mt-2 w-full resize-none border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 transition-colors duration-150 ease-out focus:border-gold focus:outline-none"
-                    ></textarea>
-                </div>
-
-                <div class="border-t border-gold/30 pt-8">
-                    <RsvpYesNo
-                        v-model="form.ownVehicle"
-                        name="ownVehicle"
-                        label="Déplacement avec votre propre véhicule ? *"
-                        :error="validationErrors.ownVehicle"
-                    />
-                </div>
-
-                <div>
-                    <label class="eyebrow block" for="message">Un petit mot pour les mariés</label>
-                    <textarea
-                        id="message"
-                        v-model="form.message"
-                        rows="4"
-                        class="mt-2 w-full resize-none border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink placeholder:text-ink/30 transition-colors duration-150 ease-out focus:border-gold focus:outline-none"
-                    ></textarea>
-                </div>
-
-                <Transition name="error">
-                    <p v-if="status === 'error'" class="text-center font-serif text-base text-red-700">
-                        {{ errorMessage }}
+                <div
+                    v-if="status === 'success'"
+                    key="success"
+                    class="mt-12 border border-gold/40 bg-[#fafaf7] p-10 text-center"
+                >
+                    <p class="font-display text-4xl text-gold">Merci&nbsp;!</p>
+                    <p class="mt-4 font-serif text-lg text-ink/80">
+                        Votre réponse a bien été enregistrée. Nous avons hâte de célébrer ce moment avec vous.
                     </p>
-                </Transition>
-
-                <div class="flex justify-center pt-4">
-                    <button
-                        type="submit"
-                        :disabled="isSubmitting"
-                        class="inline-flex items-center justify-center border border-gold bg-gold px-10 py-3 font-sans text-xs uppercase tracking-widest text-paper transition duration-200 ease-emph-out hover:bg-gold-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
-                    >
-                        {{ isSubmitting ? 'Envoi…' : 'Envoyer ma réponse' }}
-                    </button>
                 </div>
-            </form>
+
+                <form v-else key="form" class="mt-12 space-y-8" novalidate @submit.prevent="onSubmit">
+                    <!-- Honeypot -->
+                    <div class="hidden" aria-hidden="true">
+                        <label>
+                            Ne pas remplir
+                            <input v-model="form.website" type="text" name="website" tabindex="-1" autocomplete="off" />
+                        </label>
+                    </div>
+
+                    <div class="grid gap-6 md:grid-cols-2">
+                        <div class="md:col-span-2">
+                            <label class="eyebrow block" for="fullName">Nom et prénom *</label>
+                            <input
+                                id="fullName"
+                                v-model="form.fullName"
+                                type="text"
+                                autocomplete="name"
+                                required
+                                class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink transition-colors duration-150 ease-out placeholder:text-ink/30 focus:border-gold focus:outline-none"
+                                :class="{ 'border-red-600': validationErrors.fullName }"
+                            />
+                            <Transition name="error">
+                                <p v-if="validationErrors.fullName" class="mt-1 text-sm text-red-700">
+                                    {{ validationErrors.fullName }}
+                                </p>
+                            </Transition>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="eyebrow block" for="plusOne">Nom et prénom de l’accompagnant·e</label>
+                            <input
+                                id="plusOne"
+                                v-model="form.plusOne"
+                                type="text"
+                                class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink transition-colors duration-150 ease-out placeholder:text-ink/30 focus:border-gold focus:outline-none"
+                            />
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="eyebrow block" for="address">Adresse *</label>
+                            <input
+                                id="address"
+                                v-model="form.address"
+                                type="text"
+                                autocomplete="street-address"
+                                required
+                                class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink transition-colors duration-150 ease-out placeholder:text-ink/30 focus:border-gold focus:outline-none"
+                                :class="{ 'border-red-600': validationErrors.address }"
+                            />
+                            <Transition name="error">
+                                <p v-if="validationErrors.address" class="mt-1 text-sm text-red-700">
+                                    {{ validationErrors.address }}
+                                </p>
+                            </Transition>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="eyebrow block" for="locality">Localité *</label>
+                            <input
+                                id="locality"
+                                v-model="form.locality"
+                                type="text"
+                                autocomplete="address-level2"
+                                required
+                                class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink transition-colors duration-150 ease-out placeholder:text-ink/30 focus:border-gold focus:outline-none"
+                                :class="{ 'border-red-600': validationErrors.locality }"
+                            />
+                            <Transition name="error">
+                                <p v-if="validationErrors.locality" class="mt-1 text-sm text-red-700">
+                                    {{ validationErrors.locality }}
+                                </p>
+                            </Transition>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="eyebrow block" for="email">Adresse e-mail</label>
+                            <input
+                                id="email"
+                                v-model="form.email"
+                                type="email"
+                                autocomplete="email"
+                                class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink transition-colors duration-150 ease-out placeholder:text-ink/30 focus:border-gold focus:outline-none"
+                                :class="{ 'border-red-600': validationErrors.email }"
+                            />
+                            <Transition name="error">
+                                <p v-if="validationErrors.email" class="mt-1 text-sm text-red-700">
+                                    {{ validationErrors.email }}
+                                </p>
+                            </Transition>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="eyebrow block" for="childrenCount">Nombre d'enfants présents</label>
+                            <input
+                                id="childrenCount"
+                                v-model="form.childrenCount"
+                                type="text"
+                                inputmode="numeric"
+                                class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink transition-colors duration-150 ease-out placeholder:text-ink/30 focus:border-gold focus:outline-none"
+                                :class="{ 'border-red-600': validationErrors.childrenCount }"
+                            />
+                            <Transition name="error">
+                                <p v-if="validationErrors.childrenCount" class="mt-1 text-sm text-red-700">
+                                    {{ validationErrors.childrenCount }}
+                                </p>
+                            </Transition>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-gold/30 pt-8">
+                        <label class="eyebrow block" for="dietary">Restrictions alimentaires</label>
+                        <textarea
+                            id="dietary"
+                            v-model="form.dietary"
+                            rows="2"
+                            placeholder="Allergies, régime particulier…"
+                            class="mt-2 w-full resize-none border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink transition-colors duration-150 ease-out placeholder:text-ink/30 focus:border-gold focus:outline-none"
+                        ></textarea>
+                    </div>
+
+                    <div class="border-t border-gold/30 pt-8">
+                        <RsvpYesNo
+                            v-model="form.ownVehicle"
+                            name="ownVehicle"
+                            label="Préférez-vous vous déplacer avec votre propre véhicule ? *"
+                            :error="validationErrors.ownVehicle"
+                        />
+                    </div>
+
+                    <div>
+                        <label class="eyebrow block" for="message">Un petit mot pour les mariés</label>
+                        <textarea
+                            id="message"
+                            v-model="form.message"
+                            rows="4"
+                            class="mt-2 w-full resize-none border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink transition-colors duration-150 ease-out placeholder:text-ink/30 focus:border-gold focus:outline-none"
+                        ></textarea>
+                    </div>
+
+                    <Transition name="error">
+                        <p v-if="status === 'error'" class="text-center font-serif text-base text-red-700">
+                            {{ errorMessage }}
+                        </p>
+                    </Transition>
+
+                    <div class="flex justify-center pt-4">
+                        <button
+                            type="submit"
+                            :disabled="isSubmitting"
+                            class="inline-flex items-center justify-center border border-gold bg-gold px-10 py-3 font-sans text-xs uppercase tracking-widest text-paper transition duration-200 ease-emph-out hover:bg-gold-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
+                        >
+                            {{ isSubmitting ? 'Envoi…' : 'Envoyer ma réponse' }}
+                        </button>
+                    </div>
+                </form>
             </Transition>
         </div>
     </section>

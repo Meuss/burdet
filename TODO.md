@@ -33,7 +33,7 @@ The site renders, but a few pieces of copy are either placeholders or guesses fr
 - [ ] Create a new Google Sheet. Name the tab something boring like `rsvp`.
 - [ ] First row = headers. Match the order the function writes (see `SHEET_COLUMNS` in [submit-rsvp.ts](netlify/functions/submit-rsvp.ts)):
     ```
-    submittedAt | submissionId | fullName | plusOne | address | phone | email | transportBus | transportTaxi | transportSelf | dietary | message
+    submittedAt | submissionId | fullName | plusOne | address | locality | email | childrenCount | dietary | ownVehicle | message
     ```
 - [ ] Copy the **Sheet ID** from the URL (`https://docs.google.com/spreadsheets/d/<THIS_PART>/edit`) — save it for env vars.
 - [ ] Go to [Google Cloud Console](https://console.cloud.google.com/) → **Create a new project** (e.g. `stephanie-jeremy-rsvp`).

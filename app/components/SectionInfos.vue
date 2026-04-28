@@ -14,8 +14,25 @@
                         Transports publics
                     </h3>
                     <p class="mt-3 font-serif text-base leading-relaxed text-ink/80">
-                        Merci de vous déplacer en transport public jusqu&rsquo;à l&rsquo;Église Saint-Jean&nbsp;: depuis
-                        Fribourg gare, bus N°4 en direction d&rsquo;Auge Sous-Pont, sortie Église Saint-Jean.
+                        En raison des places de parking limitées et pour profiter pleinement de cette journée spéciale,
+                        nous vous encourageons à venir à l'église en transport public. Cela vous permettra de vous
+                        détendre et de profiter de chaque moment sans souci.
+                    </p>
+                    <p class="mt-3 font-serif text-base leading-relaxed text-ink/80">
+                        Depuis la gare de Fribourg : prenez le bus n°4 en direction d'Auge Sous-Pont, et descendez à
+                        l'arrêt «&nbsp;église Saint-Jean&nbsp;».
+                    </p>
+                </article>
+
+                <article>
+                    <h3 class="font-sans text-sm font-semibold uppercase tracking-widest text-gold">Contacts</h3>
+                    <p class="mt-3 font-serif text-base leading-relaxed text-ink/80">
+                        Si vous souhaitez intervenir durant cette merveilleuse journée, veuillez contacter nos maîtres
+                        de cérémonie,
+                        <span class="whitespace-nowrap">Marco Gorgoni</span> au
+                        <a href="tel:+41794335494">079&nbsp;433&nbsp;54&nbsp;94</a> et
+                        <span class="whitespace-nowrap">Donovan Gumy</span> au
+                        <a href="tel:+41794390992">079&nbsp;439&nbsp;09&nbsp;92</a>, avant le 15 juin.
                     </p>
                 </article>
 
@@ -27,10 +44,11 @@
                 </article>
 
                 <article>
-                    <h3 class="font-sans text-sm font-semibold uppercase tracking-widest text-gold">Taxi retour</h3>
+                    <h3 class="font-sans text-sm font-semibold uppercase tracking-widest text-gold">Retour en taxi</h3>
                     <p class="mt-3 font-serif text-base leading-relaxed text-ink/80">
-                        Pour votre retour, notre taxi préféré «&nbsp;Viman&nbsp;» sera joignable durant la soirée au
-                        079&nbsp;…
+                        Après une soirée mémorable, vous pourrez facilement contacter notre taxi préféré à tout moment
+                        pour organiser votre retour en toute tranquillité. Contact : SpaceTaxi au
+                        079&nbsp;801&nbsp;22&nbsp;42.
                     </p>
                 </article>
 
@@ -40,28 +58,21 @@
                 </article>
 
                 <article>
-                    <h3 class="font-sans text-sm font-semibold uppercase tracking-widest text-gold">Contacts</h3>
-                    <p class="mt-3 font-serif text-base leading-relaxed text-ink/80">
-                        Si vous souhaitez intervenir durant cette merveilleuse journée, contactez nos majors de table
-                        <span class="whitespace-nowrap">Marco Gorgoni</span> au 079&nbsp;… et
-                        <span class="whitespace-nowrap">Donovan Gumy</span> d&rsquo;ici au 15 juin.
-                    </p>
-                </article>
-
-                <article>
                     <h3 class="font-sans text-sm font-semibold uppercase tracking-widest text-gold">Enfants</h3>
                     <p class="mt-3 font-serif text-base leading-relaxed text-ink/80">
                         Les enfants sont les bienvenus pour la cérémonie et l&rsquo;apéritif. Nous comptons sur chacun
                         pour respecter la solennité de ce moment religieux.
                     </p>
                     <p class="mt-3 font-serif text-base leading-relaxed text-ink/80">
-                        Le lieu des festivités restant une surprise, merci de nous contacter si vous souhaitez
-                        organiser la récupération de vos enfants aux alentours de 18h.
+                        Le lieu des festivités restant une surprise, merci de nous contacter si vous souhaitez organiser
+                        la récupération de vos enfants aux alentours de 18h.
                     </p>
                 </article>
 
                 <article class="md:col-span-2">
-                    <h3 class="font-sans text-sm font-semibold uppercase tracking-widest text-gold">Hôtels suggérés</h3>
+                    <h3 class="font-sans text-sm font-semibold uppercase tracking-widest text-gold">
+                        Si vous souhaitez réserver un hébergement près du lieu de réception, voici nos recommandations :
+                    </h3>
                     <div class="mt-3 grid gap-6 font-serif text-base leading-relaxed text-ink/80 md:grid-cols-2">
                         <div>
                             <p class="font-medium text-ink">Hôtel des innovations</p>

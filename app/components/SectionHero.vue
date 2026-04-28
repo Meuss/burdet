@@ -1,7 +1,5 @@
 <template>
     <section class="relative flex min-h-[90vh] flex-col items-center justify-center px-6 py-24 text-center">
-        <p class="eyebrow mb-8">Samedi 18 juillet 2026 &middot; Fribourg</p>
-
         <h1 class="flex flex-col items-center gap-2 font-display text-6xl leading-none md:text-8xl">
             <span class="text-gold">Stéphanie</span>
             <span class="font-serif text-2xl uppercase tracking-widest text-ink md:text-3xl">&amp;</span>
@@ -10,11 +8,11 @@
 
         <div class="mt-12 flex flex-col items-center gap-4">
             <div class="rule"></div>
-            <p class="font-serif text-lg uppercase tracking-widest text-ink md:text-xl">
+            <p class="font-serif text-xl font-semibold uppercase tracking-wider text-ink md:text-2xl">
                 18.07.2026
-                <span class="mx-3 text-gold">|</span>
+                <span class="mx-3 font-normal text-gold">|</span>
                 14:00
-                <span class="mx-3 text-gold">|</span>
+                <span class="mx-3 font-normal text-gold">|</span>
                 Fribourg
             </p>
             <div class="rule"></div>

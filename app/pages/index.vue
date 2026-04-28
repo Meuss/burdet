@@ -6,7 +6,6 @@
         <SectionProgramme />
         <SectionInfos />
         <RsvpForm />
-        <SectionPolaroid />
         <SectionFooter />
     </main>
 </template>
