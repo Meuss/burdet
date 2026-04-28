@@ -2,6 +2,10 @@ import type { Config, Context } from '@netlify/functions';
 import { google } from 'googleapis';
 import { Resend } from 'resend';
 
+const NOTIFICATION_FROM = 'no-reply@stephanie-jeremy.ch';
+const NOTIFICATION_TO = 'thomas.miller147@gmail.com';
+const OPS_ALERT_TO = 'thomas.miller147@gmail.com';
+
 interface RsvpPayload {
     fullName: string;
     plusOne: string;
@@ -140,14 +144,11 @@ function escapeHtml(s: string): string {
 
 async function sendEmail(p: ParsedPayload): Promise<void> {
     const apiKey = process.env.RESEND_API_KEY;
-    const from = 'no-reply@stephanie-jeremy.ch';
-    const recipients = 'thomas.miller147@gmail.com';
-    if (!apiKey || !from || !recipients) {
+    if (!apiKey) {
         throw new Error('Resend credentials not configured');
     }
 
-    const to = recipients
-        .split(',')
+    const to = NOTIFICATION_TO.split(',')
         .map((r) => r.trim())
         .filter(Boolean);
 
@@ -160,9 +161,125 @@ async function sendEmail(p: ParsedPayload): Promise<void> {
     const subject = `RSVP — ${p.fullName}${p.plusOne ? ` (+ ${p.plusOne})` : ''}${statusTag ? ` [${statusTag}]` : ''}`;
     const { text, html } = formatEmailBody(p);
 
-    const result = await resend.emails.send({ from, to, subject, text, html });
+    const result = await resend.emails.send({ from: NOTIFICATION_FROM, to, subject, text, html });
     if (result.error) {
         throw new Error(`Resend: ${result.error.message}`);
+    }
+}
+
+const SINK_NAMES = ['Google Sheet', 'Notification email'] as const;
+
+function describeReason(reason: unknown): string {
+    if (reason instanceof Error) {
+        return reason.stack ? `${reason.message}\n${reason.stack}` : reason.message;
+    }
+    try {
+        return JSON.stringify(reason, null, 2);
+    } catch {
+        return String(reason);
+    }
+}
+
+function alertHtml(title: string, color: string, body: string): string {
+    return `<!doctype html><html><body style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:12px;color:#111;line-height:1.5">
+<h2 style="font-family:Georgia,serif;color:${color};margin:0 0 12px">${escapeHtml(title)}</h2>
+<pre style="white-space:pre-wrap;background:#f6f6f4;padding:12px;border-radius:4px;margin:0">${escapeHtml(body)}</pre>
+</body></html>`;
+}
+
+async function sendOpsAlert(p: ParsedPayload, results: PromiseSettledResult<void>[]): Promise<void> {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+        console.error('ops alert skipped: no RESEND_API_KEY');
+        return;
+    }
+
+    const failures = results
+        .map((result, i) => ({ sink: SINK_NAMES[i] ?? `Sink #${i}`, result }))
+        .filter((f): f is { sink: string; result: PromiseRejectedResult } => f.result.status === 'rejected');
+
+    if (failures.length === 0) return;
+
+    const allFailed = failures.length === results.length;
+    const title = allFailed ? '🚨 RSVP COMPLETELY LOST' : '⚠️ RSVP partial failure';
+
+    const reasonText = failures
+        .map(({ sink, result }) => `--- ${sink} ---\n${describeReason(result.reason)}`)
+        .join('\n\n');
+
+    let dump: string;
+    try {
+        dump = JSON.stringify(p, null, 2);
+    } catch {
+        dump = '(payload could not be serialized)';
+    }
+
+    const body = [
+        `Severity: ${title}`,
+        `Submission ID: ${p.submissionId}`,
+        `When: ${p.submittedAt}`,
+        '',
+        'Failures:',
+        reasonText,
+        '',
+        'Full submission payload:',
+        dump,
+    ].join('\n');
+
+    const subject = `${title} — ${p.fullName || '(sans nom)'}`;
+    const resend = new Resend(apiKey);
+    const result = await resend.emails.send({
+        from: NOTIFICATION_FROM,
+        to: OPS_ALERT_TO.split(',')
+            .map((r) => r.trim())
+            .filter(Boolean),
+        subject,
+        text: body,
+        html: alertHtml(title, allFailed ? '#b00020' : '#c49b3d', body),
+    });
+    if (result.error) {
+        throw new Error(`ops alert send failed: ${result.error.message}`);
+    }
+}
+
+async function sendCrashAlert(raw: unknown, err: unknown): Promise<void> {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+        console.error('crash alert skipped: no RESEND_API_KEY');
+        return;
+    }
+
+    let dump: string;
+    try {
+        dump = JSON.stringify(raw, null, 2);
+    } catch {
+        dump = String(raw);
+    }
+
+    const body = [
+        'The RSVP function crashed before completing.',
+        `When: ${new Date().toISOString()}`,
+        '',
+        'Error:',
+        describeReason(err),
+        '',
+        'Raw request body:',
+        dump,
+    ].join('\n');
+
+    const title = '🚨 RSVP function crash';
+    const resend = new Resend(apiKey);
+    const result = await resend.emails.send({
+        from: NOTIFICATION_FROM,
+        to: OPS_ALERT_TO.split(',')
+            .map((r) => r.trim())
+            .filter(Boolean),
+        subject: title,
+        text: body,
+        html: alertHtml(title, '#b00020', body),
+    });
+    if (result.error) {
+        throw new Error(`crash alert send failed: ${result.error.message}`);
     }
 }
 
@@ -178,48 +295,61 @@ export default async (req: Request, _context: Context): Promise<Response> => {
         return jsonResponse(400, { message: 'Corps de requête invalide.' });
     }
 
-    const parsed = parsePayload(raw);
-    if (!parsed) return jsonResponse(400, { message: 'Corps de requête invalide.' });
+    try {
+        const parsed = parsePayload(raw);
+        if (!parsed) return jsonResponse(400, { message: 'Corps de requête invalide.' });
 
-    // Honeypot: silently succeed to avoid telegraphing the filter.
-    if (parsed.website) {
-        return jsonResponse(200, { ok: true });
-    }
-
-    const validationError = validate(parsed);
-    if (validationError) {
-        return jsonResponse(400, { message: validationError });
-    }
-
-    const enriched: ParsedPayload = {
-        ...parsed,
-        submissionId: crypto.randomUUID(),
-        submittedAt: new Date().toISOString(),
-    };
-
-    const results = await Promise.allSettled([appendToSheet(enriched), sendEmail(enriched)]);
-
-    const [sheetResult, emailResult] = results;
-
-    console.log('rsvp submission', {
-        submissionId: enriched.submissionId,
-        sheet: sheetResult.status,
-        email: emailResult.status,
-    });
-    results.forEach((r, i) => {
-        if (r.status === 'rejected') {
-            console.error(`rsvp sink ${['sheet', 'email'][i]} failed`, r.reason);
+        // Honeypot: silently succeed to avoid telegraphing the filter.
+        if (parsed.website) {
+            return jsonResponse(200, { ok: true });
         }
-    });
 
-    if (sheetResult.status === 'fulfilled' || emailResult.status === 'fulfilled') {
-        return jsonResponse(200, { ok: true, submissionId: enriched.submissionId });
+        const validationError = validate(parsed);
+        if (validationError) {
+            return jsonResponse(400, { message: validationError });
+        }
+
+        const enriched: ParsedPayload = {
+            ...parsed,
+            submissionId: crypto.randomUUID(),
+            submittedAt: new Date().toISOString(),
+        };
+
+        const results = await Promise.allSettled([appendToSheet(enriched), sendEmail(enriched)]);
+
+        const [sheetResult, emailResult] = results;
+
+        console.log('rsvp submission', {
+            submissionId: enriched.submissionId,
+            sheet: sheetResult.status,
+            email: emailResult.status,
+        });
+        results.forEach((r, i) => {
+            if (r.status === 'rejected') {
+                console.error(`rsvp sink ${SINK_NAMES[i]} failed`, r.reason);
+            }
+        });
+
+        if (results.some((r) => r.status === 'rejected')) {
+            await sendOpsAlert(enriched, results).catch((e) => console.error('ops alert send failed', e));
+        }
+
+        if (sheetResult.status === 'fulfilled' || emailResult.status === 'fulfilled') {
+            return jsonResponse(200, { ok: true, submissionId: enriched.submissionId });
+        }
+
+        return jsonResponse(502, {
+            message:
+                "Votre réponse n'a pas pu être enregistrée. Merci de réessayer ou de contacter les mariés directement.",
+        });
+    } catch (err) {
+        console.error('rsvp handler crashed', err);
+        await sendCrashAlert(raw, err).catch((e) => console.error('crash alert send failed', e));
+        return jsonResponse(500, {
+            message:
+                "Votre réponse n'a pas pu être enregistrée. Merci de réessayer ou de contacter les mariés directement.",
+        });
     }
-
-    return jsonResponse(502, {
-        message:
-            "Votre réponse n'a pas pu être enregistrée. Merci de réessayer ou de contacter les mariés directement.",
-    });
 };
 
 export const config: Config = {
