@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue';
+import { computed, onBeforeUnmount, reactive, ref } from 'vue';
 
 type YesNo = 'oui' | 'non' | '';
 
@@ -37,6 +37,27 @@ const validationErrors = ref<Record<string, string>>({});
 
 const isSubmitting = computed(() => status.value === 'submitting');
 
+const showSlowMessage = ref(false);
+let slowMessageTimer: ReturnType<typeof setTimeout> | null = null;
+
+function startSubmitFeedback() {
+    showSlowMessage.value = false;
+    if (slowMessageTimer) clearTimeout(slowMessageTimer);
+    slowMessageTimer = setTimeout(() => {
+        if (status.value === 'submitting') showSlowMessage.value = true;
+    }, 800);
+}
+
+function stopSubmitFeedback() {
+    if (slowMessageTimer) {
+        clearTimeout(slowMessageTimer);
+        slowMessageTimer = null;
+    }
+    showSlowMessage.value = false;
+}
+
+onBeforeUnmount(stopSubmitFeedback);
+
 function encodeForNetlify(data: Record<string, string>): string {
     return Object.keys(data)
         .map((key) => encodeURIComponent(key) + '=' + encodeURIComponent(data[key] ?? ''))
@@ -64,6 +85,7 @@ async function onSubmit() {
     if (!validate()) return;
 
     status.value = 'submitting';
+    startSubmitFeedback();
 
     const payload = {
         fullName: form.fullName.trim(),
@@ -104,6 +126,8 @@ async function onSubmit() {
         status.value = 'error';
         errorMessage.value =
             err instanceof Error ? err.message : 'Une erreur inattendue est survenue. Merci de réessayer.';
+    } finally {
+        stopSubmitFeedback();
     }
 }
 </script>
@@ -278,14 +302,59 @@ async function onSubmit() {
                         </p>
                     </Transition>
 
-                    <div class="flex justify-center pt-4">
+                    <div class="flex flex-col items-center pt-4">
                         <button
                             type="submit"
                             :disabled="isSubmitting"
-                            class="inline-flex items-center justify-center border border-gold bg-gold px-10 py-3 font-sans text-xs uppercase tracking-widest text-paper transition duration-200 ease-emph-out hover:bg-gold-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
+                            :aria-busy="isSubmitting"
+                            :class="[
+                                'submit-btn relative inline-flex min-w-[15rem] items-center justify-center overflow-hidden border border-gold bg-gold px-10 py-3 font-sans text-xs uppercase tracking-widest text-paper transition duration-200 ease-emph-out hover:bg-gold-dark active:scale-[0.98] disabled:cursor-progress disabled:active:scale-100',
+                                { 'is-submitting': isSubmitting },
+                            ]"
                         >
-                            {{ isSubmitting ? 'Envoi…' : 'Envoyer ma réponse' }}
+                            <Transition name="btn-swap" mode="out-in">
+                                <span
+                                    v-if="isSubmitting"
+                                    key="loading"
+                                    class="inline-flex items-center gap-2.5"
+                                    aria-live="polite"
+                                >
+                                    <svg
+                                        class="spinner h-4 w-4"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        aria-hidden="true"
+                                    >
+                                        <circle
+                                            cx="12"
+                                            cy="12"
+                                            r="9"
+                                            stroke="currentColor"
+                                            stroke-opacity="0.3"
+                                            stroke-width="2.5"
+                                        />
+                                        <path
+                                            d="M21 12a9 9 0 0 0-9-9"
+                                            stroke="currentColor"
+                                            stroke-width="2.5"
+                                            stroke-linecap="round"
+                                        />
+                                    </svg>
+                                    <span>Envoi en cours</span>
+                                </span>
+                                <span v-else key="idle">Envoyer ma réponse</span>
+                            </Transition>
                         </button>
+
+                        <Transition name="hint">
+                            <p
+                                v-if="showSlowMessage"
+                                class="mt-4 font-serif text-sm italic leading-relaxed text-ink/60"
+                                aria-live="polite"
+                            >
+                                Cela peut prendre quelques instants, merci de patienter…
+                            </p>
+                        </Transition>
                     </div>
                 </form>
             </Transition>
@@ -329,17 +398,100 @@ async function onSubmit() {
     opacity: 0;
 }
 
+.btn-swap-enter-active,
+.btn-swap-leave-active {
+    transition:
+        opacity 160ms cubic-bezier(0.23, 1, 0.32, 1),
+        transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.btn-swap-enter-from {
+    opacity: 0;
+    transform: translateY(4px);
+}
+.btn-swap-leave-to {
+    opacity: 0;
+    transform: translateY(-4px);
+}
+
+.spinner {
+    animation: spinner-rotate 0.9s linear infinite;
+}
+@keyframes spinner-rotate {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.submit-btn.is-submitting {
+    cursor: progress;
+}
+.submit-btn.is-submitting::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        110deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.18) 45%,
+        rgba(255, 255, 255, 0.32) 50%,
+        rgba(255, 255, 255, 0.18) 55%,
+        transparent 70%
+    );
+    transform: translateX(-100%);
+    animation: btn-shimmer 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    pointer-events: none;
+}
+@keyframes btn-shimmer {
+    to {
+        transform: translateX(100%);
+    }
+}
+
+.hint-enter-active {
+    transition:
+        opacity 320ms cubic-bezier(0.23, 1, 0.32, 1),
+        transform 320ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.hint-leave-active {
+    transition:
+        opacity 200ms ease-out,
+        transform 200ms ease-out;
+}
+.hint-enter-from {
+    opacity: 0;
+    transform: translateY(6px);
+}
+.hint-leave-to {
+    opacity: 0;
+    transform: translateY(-2px);
+}
+
 @media (prefers-reduced-motion: reduce) {
     .swap-enter-active,
     .swap-leave-active,
     .error-enter-active,
-    .error-leave-active {
+    .error-leave-active,
+    .btn-swap-enter-active,
+    .btn-swap-leave-active,
+    .hint-enter-active,
+    .hint-leave-active {
         transition-duration: 120ms;
     }
     .swap-enter-from,
     .swap-leave-to,
-    .error-enter-from {
+    .error-enter-from,
+    .btn-swap-enter-from,
+    .btn-swap-leave-to,
+    .hint-enter-from,
+    .hint-leave-to {
         transform: none;
+    }
+    .spinner {
+        animation: spinner-rotate 2.4s linear infinite;
+    }
+    .submit-btn.is-submitting::after {
+        animation: none;
+        display: none;
     }
 }
 </style>
