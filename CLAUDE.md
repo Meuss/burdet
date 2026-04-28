@@ -2,7 +2,7 @@
 
 ## Project
 
-Wedding website for Stéphanie & Jérémy (domain: stephanie-jeremy.ch). Single-page static site in French with an RSVP form. Full spec in [PLAN.md](PLAN.md) — treat it as the source of truth for scope, fields, and flow.
+Wedding website for Stéphanie & Jérémy (domain: stephanie-jeremy.ch). Single-page static site in French with an RSVP form. See [README.md](README.md) for the submission architecture.
 
 ## Stack
 
@@ -32,7 +32,7 @@ pnpm preview
 
 ## RSVP form — non-obvious bits
 
-- Three redundant submission sinks run in parallel via `Promise.allSettled` in the Netlify Function: Google Sheets (primary), Resend email, and Netlify Forms. Success if _any_ of sheet/email succeeds. See [PLAN.md](PLAN.md) §"Submission flow".
+- Three redundant submission sinks run in parallel via `Promise.allSettled` in the Netlify Function: Google Sheets (primary), Resend email, and Netlify Forms. Success if _any_ of sheet/email succeeds. See [README.md](README.md) §"RSVP submission".
 - Netlify Forms needs a **static hidden HTML form** registered at build time (because the real form is JS-submitted). Don't skip this — it's the third independent backup.
 - Honeypot field on the form — server must reject submissions where it's non-empty.
 - `GOOGLE_PRIVATE_KEY` env var: watch newline escaping when loading into the function.
