@@ -7,6 +7,7 @@ interface FormState {
     fullName: string;
     plusOne: string;
     address: string;
+    npa: string;
     locality: string;
     email: string;
     childrenCount: string;
@@ -21,6 +22,7 @@ const form = reactive<FormState>({
     fullName: '',
     plusOne: '',
     address: '',
+    npa: '',
     locality: '',
     email: '',
     childrenCount: '',
@@ -68,7 +70,8 @@ function validate(): boolean {
     const errors: Record<string, string> = {};
     if (!form.fullName.trim()) errors.fullName = 'Merci d’indiquer votre nom et prénom.';
     if (!form.address.trim()) errors.address = 'Merci d’indiquer votre adresse.';
-    if (!form.locality.trim()) errors.locality = 'Merci d’indiquer votre localité.';
+    if (!form.npa.trim()) errors.npa = 'Merci d’indiquer votre code postal.';
+    if (!form.locality.trim()) errors.locality = 'Merci d’indiquer votre ville.';
     if (!form.ownVehicle) errors.ownVehicle = 'Merci de répondre.';
     if (form.email && !/^\S+@\S+\.\S+$/.test(form.email)) {
         errors.email = 'Adresse e-mail invalide.';
@@ -91,6 +94,7 @@ async function onSubmit() {
         fullName: form.fullName.trim(),
         plusOne: form.plusOne.trim(),
         address: form.address.trim(),
+        npa: form.npa.trim(),
         locality: form.locality.trim(),
         email: form.email.trim(),
         childrenCount: form.childrenCount.trim(),
@@ -213,8 +217,27 @@ async function onSubmit() {
                             </Transition>
                         </div>
 
-                        <div class="md:col-span-2">
-                            <label class="eyebrow block" for="locality">Localité *</label>
+                        <div>
+                            <label class="eyebrow block" for="npa">Code postal *</label>
+                            <input
+                                id="npa"
+                                v-model="form.npa"
+                                type="text"
+                                inputmode="numeric"
+                                autocomplete="postal-code"
+                                required
+                                class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink transition-colors duration-150 ease-out placeholder:text-ink/30 focus:border-gold focus:outline-none"
+                                :class="{ 'border-red-600': validationErrors.npa }"
+                            />
+                            <Transition name="error">
+                                <p v-if="validationErrors.npa" class="mt-1 text-sm text-red-700">
+                                    {{ validationErrors.npa }}
+                                </p>
+                            </Transition>
+                        </div>
+
+                        <div>
+                            <label class="eyebrow block" for="locality">Ville *</label>
                             <input
                                 id="locality"
                                 v-model="form.locality"
@@ -319,12 +342,7 @@ async function onSubmit() {
                                     class="inline-flex items-center gap-2.5"
                                     aria-live="polite"
                                 >
-                                    <svg
-                                        class="spinner h-4 w-4"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        aria-hidden="true"
-                                    >
+                                    <svg class="spinner h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                                         <circle
                                             cx="12"
                                             cy="12"

@@ -10,6 +10,7 @@ interface RsvpPayload {
     fullName: string;
     plusOne: string;
     address: string;
+    npa: string;
     locality: string;
     email: string;
     childrenCount: string;
@@ -31,6 +32,7 @@ const SHEET_COLUMNS: Array<keyof ParsedPayload | 'submittedAt' | 'submissionId'>
     'fullName',
     'plusOne',
     'address',
+    'npa',
     'locality',
     'email',
     'childrenCount',
@@ -54,6 +56,7 @@ function parsePayload(raw: unknown): RsvpPayload | null {
         fullName: str(r.fullName),
         plusOne: str(r.plusOne),
         address: str(r.address),
+        npa: str(r.npa),
         locality: str(r.locality),
         email: str(r.email),
         childrenCount: str(r.childrenCount),
@@ -67,7 +70,8 @@ function parsePayload(raw: unknown): RsvpPayload | null {
 function validate(p: RsvpPayload): string | null {
     if (!p.fullName) return 'Nom et prénom manquants.';
     if (!p.address) return 'Adresse manquante.';
-    if (!p.locality) return 'Localité manquante.';
+    if (!p.npa) return 'Code postal manquant.';
+    if (!p.locality) return 'Ville manquante.';
     const yn = new Set(['oui', 'non']);
     if (!yn.has(p.ownVehicle)) return 'Réponse propre véhicule manquante.';
     if (p.email && !/^\S+@\S+\.\S+$/.test(p.email)) return 'E-mail invalide.';
@@ -107,7 +111,8 @@ function formatEmailBody(p: ParsedPayload): { text: string; html: string } {
         ['Nom et prénom', p.fullName],
         ['Accompagnant·e', p.plusOne || '—'],
         ['Adresse', p.address],
-        ['Localité', p.locality],
+        ['Code postal', p.npa],
+        ['Ville', p.locality],
         ['E-mail', p.email || '—'],
         ['Enfants (nombre)', p.childrenCount || '—'],
         ['Restrictions alimentaires', p.dietary || '—'],
@@ -194,9 +199,12 @@ async function sendOpsAlert(p: ParsedPayload, results: PromiseSettledResult<void
         return;
     }
 
-    const failures = results
-        .map((result, i) => ({ sink: SINK_NAMES[i] ?? `Sink #${i}`, result }))
-        .filter((f): f is { sink: string; result: PromiseRejectedResult } => f.result.status === 'rejected');
+    const failures: Array<{ sink: string; result: PromiseRejectedResult }> = [];
+    results.forEach((result, i) => {
+        if (result.status === 'rejected') {
+            failures.push({ sink: SINK_NAMES[i] ?? `Sink #${i}`, result });
+        }
+    });
 
     if (failures.length === 0) return;
 

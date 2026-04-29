@@ -54,6 +54,10 @@
                     </p>
                 </article>
             </div>
+
+            <p class="mt-16 text-center font-display text-3xl leading-tight text-gold md:mt-20 md:text-4xl">
+                Nous comptons sur vous pour mettre l&rsquo;ambiance&nbsp;!
+            </p>
         </div>
     </section>
 </template>

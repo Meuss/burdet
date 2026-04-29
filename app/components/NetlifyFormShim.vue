@@ -3,6 +3,7 @@
         <input type="text" name="fullName" />
         <input type="text" name="plusOne" />
         <input type="text" name="address" />
+        <input type="text" name="npa" />
         <input type="text" name="locality" />
         <input type="email" name="email" />
         <input type="number" name="childrenCount" />

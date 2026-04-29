@@ -24,15 +24,12 @@
                     </p>
                 </article>
 
-                <article>
+                <article class="order-2 md:order-none">
                     <h3 class="font-sans text-sm font-semibold uppercase tracking-widest text-gold">Contacts</h3>
                     <p class="mt-3 font-serif text-base leading-relaxed text-ink/80">
-                        Si vous souhaitez intervenir durant cette merveilleuse journée, veuillez contacter nos maîtres
-                        de cérémonie,
-                        <span class="whitespace-nowrap">Marco Gorgoni</span> au
-                        <a href="tel:+41794335494">079&nbsp;433&nbsp;54&nbsp;94</a> et
-                        <span class="whitespace-nowrap">Donovan Gumy</span> au
-                        <a href="tel:+41794390992">079&nbsp;439&nbsp;09&nbsp;92</a>, avant le 15 juin.
+                        Si vous souhaitez intervenir durant cette merveilleuse journée, veuillez contacter notre maître
+                        de cérémonie, <span class="whitespace-nowrap">Marco Gorgoni</span> au
+                        <a href="tel:+41794335494">079&nbsp;433&nbsp;54&nbsp;94</a>, avant le 15 juin.
                     </p>
                 </article>
 
@@ -57,7 +54,7 @@
                     <p class="mt-3 font-serif text-base leading-relaxed text-ink/80">Faites-vous plaisir&nbsp;!</p>
                 </article>
 
-                <article>
+                <article class="order-3 md:order-none">
                     <h3 class="font-sans text-sm font-semibold uppercase tracking-widest text-gold">Enfants</h3>
                     <p class="mt-3 font-serif text-base leading-relaxed text-ink/80">
                         Les enfants sont les bienvenus pour la cérémonie et l&rsquo;apéritif. Nous comptons sur chacun
@@ -69,7 +66,7 @@
                     </p>
                 </article>
 
-                <article class="md:col-span-2">
+                <article class="order-4 md:order-none md:col-span-2">
                     <h3 class="font-sans text-sm font-semibold uppercase tracking-widest text-gold">
                         Si vous souhaitez réserver un hébergement près du lieu de réception, voici nos recommandations :
                     </h3>

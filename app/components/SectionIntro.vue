@@ -70,9 +70,6 @@ onBeforeUnmount(() => {
                         Planche supérieure 9<br />
                         1700 Fribourg
                     </p>
-                    <p class="font-display text-3xl text-gold md:text-4xl">
-                        Nous comptons sur vous pour mettre l&rsquo;ambiance&nbsp;!
-                    </p>
                 </div>
             </div>
         </div>
