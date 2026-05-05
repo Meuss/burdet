@@ -9,7 +9,7 @@
             </div>
 
             <div class="grid gap-10 md:grid-cols-2 md:gap-x-16 md:gap-y-12">
-                <article>
+                <article class="md:order-1">
                     <h3 class="font-sans text-sm font-semibold uppercase tracking-widest text-gold">
                         Transports publics
                     </h3>
@@ -24,7 +24,28 @@
                     </p>
                 </article>
 
-                <article class="order-2 md:order-none">
+                <article class="md:order-3">
+                    <h3 class="font-sans text-sm font-semibold uppercase tracking-widest text-gold">Transfert bus</h3>
+                    <p class="mt-3 font-serif text-base leading-relaxed text-ink/80">
+                        Un bus sera organisé entre la cérémonie et le lieu de réception.
+                    </p>
+                </article>
+
+                <article class="md:order-5">
+                    <h3 class="font-sans text-sm font-semibold uppercase tracking-widest text-gold">Retour en taxi</h3>
+                    <p class="mt-3 font-serif text-base leading-relaxed text-ink/80">
+                        Après une soirée mémorable, vous pourrez facilement contacter notre taxi préféré à tout moment
+                        pour organiser votre retour en toute tranquillité. Contact : SpaceTaxi au
+                        079&nbsp;801&nbsp;22&nbsp;42.
+                    </p>
+                </article>
+
+                <article class="md:order-2">
+                    <h3 class="font-sans text-sm font-semibold uppercase tracking-widest text-gold">Dress code</h3>
+                    <p class="mt-3 font-serif text-base leading-relaxed text-ink/80">Faites-vous plaisir&nbsp;!</p>
+                </article>
+
+                <article class="md:order-4">
                     <h3 class="font-sans text-sm font-semibold uppercase tracking-widest text-gold">Contacts</h3>
                     <p class="mt-3 font-serif text-base leading-relaxed text-ink/80">
                         Si vous souhaitez intervenir durant cette merveilleuse journée, veuillez contacter notre maître
@@ -33,28 +54,7 @@
                     </p>
                 </article>
 
-                <article>
-                    <h3 class="font-sans text-sm font-semibold uppercase tracking-widest text-gold">Transfert bus</h3>
-                    <p class="mt-3 font-serif text-base leading-relaxed text-ink/80">
-                        Un bus sera organisé entre la cérémonie et le lieu de réception.
-                    </p>
-                </article>
-
-                <article>
-                    <h3 class="font-sans text-sm font-semibold uppercase tracking-widest text-gold">Retour en taxi</h3>
-                    <p class="mt-3 font-serif text-base leading-relaxed text-ink/80">
-                        Après une soirée mémorable, vous pourrez facilement contacter notre taxi préféré à tout moment
-                        pour organiser votre retour en toute tranquillité. Contact : SpaceTaxi au
-                        079&nbsp;801&nbsp;22&nbsp;42.
-                    </p>
-                </article>
-
-                <article>
-                    <h3 class="font-sans text-sm font-semibold uppercase tracking-widest text-gold">Dress code</h3>
-                    <p class="mt-3 font-serif text-base leading-relaxed text-ink/80">Faites-vous plaisir&nbsp;!</p>
-                </article>
-
-                <article class="order-3 md:order-none">
+                <article class="md:order-6">
                     <h3 class="font-sans text-sm font-semibold uppercase tracking-widest text-gold">Enfants</h3>
                     <p class="mt-3 font-serif text-base leading-relaxed text-ink/80">
                         Les enfants sont les bienvenus pour la cérémonie et l&rsquo;apéritif. Nous comptons sur chacun
@@ -66,7 +66,7 @@
                     </p>
                 </article>
 
-                <article class="order-4 md:order-none md:col-span-2">
+                <article class="md:order-7 md:col-span-2">
                     <h3 class="font-sans text-sm font-semibold uppercase tracking-widest text-gold">
                         Si vous souhaitez réserver un hébergement près du lieu de réception, voici nos recommandations :
                     </h3>
