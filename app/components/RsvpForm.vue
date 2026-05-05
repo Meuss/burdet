@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, reactive, ref } from 'vue';
+import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
 
 type YesNo = 'oui' | 'non' | '';
+type Attendance = 'seul' | 'accompagne' | '';
 
 interface FormState {
+    attendance: Attendance;
     fullName: string;
     plusOne: string;
     address: string;
@@ -19,6 +21,7 @@ interface FormState {
 }
 
 const form = reactive<FormState>({
+    attendance: '',
     fullName: '',
     plusOne: '',
     address: '',
@@ -31,6 +34,16 @@ const form = reactive<FormState>({
     message: '',
     website: '',
 });
+
+watch(
+    () => form.attendance,
+    (val) => {
+        if (val === 'seul') {
+            form.plusOne = '';
+            delete validationErrors.value.plusOne;
+        }
+    },
+);
 
 type Status = 'idle' | 'submitting' | 'success' | 'error';
 const status = ref<Status>('idle');
@@ -60,15 +73,19 @@ function stopSubmitFeedback() {
 
 onBeforeUnmount(stopSubmitFeedback);
 
-function encodeForNetlify(data: Record<string, string>): string {
+function encodeForNetlify(data: Record<string, string | number>): string {
     return Object.keys(data)
-        .map((key) => encodeURIComponent(key) + '=' + encodeURIComponent(data[key] ?? ''))
+        .map((key) => encodeURIComponent(key) + '=' + encodeURIComponent(String(data[key] ?? '')))
         .join('&');
 }
 
 function validate(): boolean {
     const errors: Record<string, string> = {};
+    if (!form.attendance) errors.attendance = 'Merci de répondre.';
     if (!form.fullName.trim()) errors.fullName = 'Merci d’indiquer votre nom et prénom.';
+    if (form.attendance === 'accompagne' && !form.plusOne.trim()) {
+        errors.plusOne = 'Merci d’indiquer le nom de votre accompagnant·e.';
+    }
     if (!form.address.trim()) errors.address = 'Merci d’indiquer votre adresse.';
     if (!form.npa.trim()) errors.npa = 'Merci d’indiquer votre code postal.';
     if (!form.locality.trim()) errors.locality = 'Merci d’indiquer votre ville.';
@@ -90,9 +107,11 @@ async function onSubmit() {
     status.value = 'submitting';
     startSubmitFeedback();
 
+    const peopleCount = form.attendance === 'accompagne' ? 2 : 1;
     const payload = {
         fullName: form.fullName.trim(),
         plusOne: form.plusOne.trim(),
+        peopleCount,
         address: form.address.trim(),
         npa: form.npa.trim(),
         locality: form.locality.trim(),
@@ -172,6 +191,42 @@ async function onSubmit() {
 
                     <div class="grid gap-6 md:grid-cols-2">
                         <div class="md:col-span-2">
+                            <p class="font-serif text-base text-ink">Je viens… *</p>
+                            <div class="mt-3 flex gap-3">
+                                <label
+                                    v-for="option in (
+                                        [
+                                            { value: 'seul', label: 'Seul·e' },
+                                            { value: 'accompagne', label: 'Accompagné·e' },
+                                        ] as const
+                                    )"
+                                    :key="option.value"
+                                    class="flex-1 cursor-pointer border border-ink/20 px-4 py-3 text-center font-sans text-xs uppercase tracking-widest transition duration-150 ease-emph-out focus-within:border-gold focus-within:ring-1 focus-within:ring-gold/40 active:scale-[0.98]"
+                                    :class="
+                                        form.attendance === option.value
+                                            ? 'border-gold bg-gold text-paper'
+                                            : 'text-ink/70 hover:border-gold hover:text-ink'
+                                    "
+                                >
+                                    <input
+                                        type="radio"
+                                        name="attendance"
+                                        :value="option.value"
+                                        :checked="form.attendance === option.value"
+                                        class="sr-only"
+                                        @change="form.attendance = option.value"
+                                    />
+                                    {{ option.label }}
+                                </label>
+                            </div>
+                            <Transition name="error">
+                                <p v-if="validationErrors.attendance" class="mt-1 text-sm text-red-700">
+                                    {{ validationErrors.attendance }}
+                                </p>
+                            </Transition>
+                        </div>
+
+                        <div class="md:col-span-2">
                             <label class="eyebrow block" for="fullName">Nom et prénom *</label>
                             <input
                                 id="fullName"
@@ -189,15 +244,25 @@ async function onSubmit() {
                             </Transition>
                         </div>
 
-                        <div class="md:col-span-2">
-                            <label class="eyebrow block" for="plusOne">Nom et prénom de l’accompagnant·e</label>
-                            <input
-                                id="plusOne"
-                                v-model="form.plusOne"
-                                type="text"
-                                class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink transition-colors duration-150 ease-out placeholder:text-ink/30 focus:border-gold focus:outline-none"
-                            />
-                        </div>
+                        <Transition name="reveal">
+                            <div v-if="form.attendance === 'accompagne'" class="md:col-span-2">
+                                <label class="eyebrow block" for="plusOne">
+                                    Nom et prénom de l’accompagnant·e *
+                                </label>
+                                <input
+                                    id="plusOne"
+                                    v-model="form.plusOne"
+                                    type="text"
+                                    class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink transition-colors duration-150 ease-out placeholder:text-ink/30 focus:border-gold focus:outline-none"
+                                    :class="{ 'border-red-600': validationErrors.plusOne }"
+                                />
+                                <Transition name="error">
+                                    <p v-if="validationErrors.plusOne" class="mt-1 text-sm text-red-700">
+                                        {{ validationErrors.plusOne }}
+                                    </p>
+                                </Transition>
+                            </div>
+                        </Transition>
 
                         <div class="md:col-span-2">
                             <label class="eyebrow block" for="address">Adresse *</label>
@@ -398,6 +463,22 @@ async function onSubmit() {
 .swap-leave-to {
     opacity: 0;
     transform: scale(0.98);
+}
+
+.reveal-enter-active {
+    transition:
+        opacity 240ms cubic-bezier(0.23, 1, 0.32, 1),
+        transform 240ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.reveal-leave-active {
+    transition:
+        opacity 160ms ease-out,
+        transform 160ms ease-out;
+}
+.reveal-enter-from,
+.reveal-leave-to {
+    opacity: 0;
+    transform: translateY(-6px);
 }
 
 .error-enter-active {

@@ -2,6 +2,7 @@
     <form name="rsvp" netlify netlify-honeypot="website" hidden aria-hidden="true">
         <input type="text" name="fullName" />
         <input type="text" name="plusOne" />
+        <input type="number" name="peopleCount" />
         <input type="text" name="address" />
         <input type="text" name="npa" />
         <input type="text" name="locality" />

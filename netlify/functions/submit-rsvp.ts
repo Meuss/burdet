@@ -9,6 +9,7 @@ const OPS_ALERT_TO = 'thomas.miller147@gmail.com';
 interface RsvpPayload {
     fullName: string;
     plusOne: string;
+    peopleCount: number;
     address: string;
     npa: string;
     locality: string;
@@ -31,6 +32,7 @@ const SHEET_COLUMNS: Array<keyof ParsedPayload | 'submittedAt' | 'submissionId'>
     'submissionId',
     'fullName',
     'plusOne',
+    'peopleCount',
     'address',
     'npa',
     'locality',
@@ -52,9 +54,11 @@ function parsePayload(raw: unknown): RsvpPayload | null {
     if (!raw || typeof raw !== 'object') return null;
     const r = raw as Record<string, unknown>;
     const str = (v: unknown): string => (typeof v === 'string' ? v.trim() : '');
+    const peopleCount = typeof r.peopleCount === 'number' ? r.peopleCount : Number(r.peopleCount);
     return {
         fullName: str(r.fullName),
         plusOne: str(r.plusOne),
+        peopleCount: Number.isFinite(peopleCount) ? peopleCount : 0,
         address: str(r.address),
         npa: str(r.npa),
         locality: str(r.locality),
@@ -69,6 +73,8 @@ function parsePayload(raw: unknown): RsvpPayload | null {
 
 function validate(p: RsvpPayload): string | null {
     if (!p.fullName) return 'Nom et prénom manquants.';
+    if (p.peopleCount !== 1 && p.peopleCount !== 2) return 'Nombre de personnes invalide.';
+    if (p.peopleCount === 2 && !p.plusOne) return 'Nom de l’accompagnant·e manquant.';
     if (!p.address) return 'Adresse manquante.';
     if (!p.npa) return 'Code postal manquant.';
     if (!p.locality) return 'Ville manquante.';
@@ -95,7 +101,7 @@ async function appendToSheet(p: ParsedPayload): Promise<void> {
     });
     const sheets = google.sheets({ version: 'v4', auth });
 
-    const row = SHEET_COLUMNS.map((key) => (p as unknown as Record<string, string>)[key] ?? '');
+    const row = SHEET_COLUMNS.map((key) => (p as unknown as Record<string, unknown>)[key] ?? '');
 
     await sheets.spreadsheets.values.append({
         spreadsheetId: sheetId,
@@ -109,6 +115,7 @@ async function appendToSheet(p: ParsedPayload): Promise<void> {
 function formatEmailBody(p: ParsedPayload): { text: string; html: string } {
     const rows: Array<[string, string]> = [
         ['Nom et prénom', p.fullName],
+        ['Nombre de personnes', String(p.peopleCount)],
         ['Accompagnant·e', p.plusOne || '—'],
         ['Adresse', p.address],
         ['Code postal', p.npa],
