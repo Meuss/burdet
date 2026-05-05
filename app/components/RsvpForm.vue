@@ -51,6 +51,18 @@ const errorMessage = ref('');
 const validationErrors = ref<Record<string, string>>({});
 
 const isSubmitting = computed(() => status.value === 'submitting');
+const errorCount = computed(() => Object.keys(validationErrors.value).length);
+
+function scrollToFirstError() {
+    const firstKey = Object.keys(validationErrors.value)[0];
+    if (!firstKey) return;
+    const el =
+        (document.getElementById(firstKey) as HTMLElement | null) ??
+        (document.querySelector(`[name="${firstKey}"]`) as HTMLElement | null);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (typeof el.focus === 'function') el.focus({ preventScroll: true });
+}
 
 const showSlowMessage = ref(false);
 let slowMessageTimer: ReturnType<typeof setTimeout> | null = null;
@@ -388,6 +400,21 @@ async function onSubmit() {
                         <p v-if="status === 'error'" class="text-center font-serif text-base text-red-700">
                             {{ errorMessage }}
                         </p>
+                    </Transition>
+
+                    <Transition name="error">
+                        <button
+                            v-if="errorCount > 0"
+                            type="button"
+                            class="block w-full border border-red-600/40 bg-red-50 px-4 py-3 text-center font-serif text-sm text-red-700 transition-colors duration-150 ease-out hover:bg-red-100 active:scale-[0.99]"
+                            @click="scrollToFirstError"
+                        >
+                            {{
+                                errorCount === 1
+                                    ? 'Merci de corriger le champ en erreur ci-dessus.'
+                                    : `Merci de corriger les ${errorCount} champs en erreur ci-dessus.`
+                            }}
+                        </button>
                     </Transition>
 
                     <div class="flex flex-col items-center pt-4">
