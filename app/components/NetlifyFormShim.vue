@@ -13,4 +13,9 @@
         <textarea name="message"></textarea>
         <input type="text" name="website" />
     </form>
+    <form name="decline" netlify netlify-honeypot="website" hidden aria-hidden="true">
+        <input type="text" name="fullName" />
+        <textarea name="message"></textarea>
+        <input type="text" name="website" />
+    </form>
 </template>

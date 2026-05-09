@@ -3,6 +3,9 @@ import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
 
 type YesNo = 'oui' | 'non' | '';
 type Attendance = 'seul' | 'accompagne' | '';
+type RsvpChoice = 'oui' | 'non' | '';
+
+const rsvpChoice = ref<RsvpChoice>('');
 
 interface FormState {
     attendance: Attendance;
@@ -17,6 +20,12 @@ interface FormState {
     ownVehicle: YesNo;
     message: string;
     // honeypot
+    website: string;
+}
+
+interface DeclineFormState {
+    fullName: string;
+    message: string;
     website: string;
 }
 
@@ -35,6 +44,12 @@ const form = reactive<FormState>({
     website: '',
 });
 
+const declineForm = reactive<DeclineFormState>({
+    fullName: '',
+    message: '',
+    website: '',
+});
+
 watch(
     () => form.attendance,
     (val) => {
@@ -46,11 +61,16 @@ watch(
 );
 
 type Status = 'idle' | 'submitting' | 'success' | 'error';
+type DeclineStatus = 'idle' | 'submitting' | 'success' | 'error';
 const status = ref<Status>('idle');
+const declineStatus = ref<DeclineStatus>('idle');
 const errorMessage = ref('');
+const declineErrorMessage = ref('');
 const validationErrors = ref<Record<string, string>>({});
+const declineValidationErrors = ref<Record<string, string>>({});
 
 const isSubmitting = computed(() => status.value === 'submitting');
+const isDeclineSubmitting = computed(() => declineStatus.value === 'submitting');
 const errorCount = computed(() => Object.keys(validationErrors.value).length);
 
 function scrollToFirstError() {
@@ -165,6 +185,54 @@ async function onSubmit() {
         stopSubmitFeedback();
     }
 }
+
+function validateDecline(): boolean {
+    const errors: Record<string, string> = {};
+    if (!declineForm.fullName.trim()) errors.fullName = 'Merci d’indiquer votre nom et prénom.';
+    declineValidationErrors.value = errors;
+    return Object.keys(errors).length === 0;
+}
+
+async function onDeclineSubmit() {
+    declineErrorMessage.value = '';
+    if (!validateDecline()) return;
+
+    declineStatus.value = 'submitting';
+    startSubmitFeedback();
+
+    const payload = {
+        fullName: declineForm.fullName.trim(),
+        message: declineForm.message.trim(),
+        website: declineForm.website,
+    };
+
+    try {
+        const res = await fetch('/.netlify/functions/submit-decline', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+            const body = await res.json().catch(() => ({}));
+            throw new Error(body.message ?? `Erreur ${res.status}`);
+        }
+
+        fetch('/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: encodeForNetlify({ 'form-name': 'decline', ...payload }),
+        }).catch(() => {});
+
+        declineStatus.value = 'success';
+    } catch (err) {
+        declineStatus.value = 'error';
+        declineErrorMessage.value =
+            err instanceof Error ? err.message : 'Une erreur inattendue est survenue. Merci de réessayer.';
+    } finally {
+        stopSubmitFeedback();
+    }
+}
 </script>
 
 <template>
@@ -176,14 +244,15 @@ async function onSubmit() {
                     <div class="rule"></div>
                 </div>
                 <p class="font-serif text-base leading-relaxed text-ink/80">
-                    Merci de remplir ce formulaire pour confirmer votre participation.
+                    Merci de nous faire part de votre réponse.
                 </p>
             </div>
 
+            <!-- Yes/No gate -->
             <Transition name="swap" mode="out-in">
                 <div
                     v-if="status === 'success'"
-                    key="success"
+                    key="accept-success"
                     class="mt-12 border border-gold/40 bg-[#fafaf7] p-10 text-center"
                 >
                     <p class="font-display text-4xl text-gold">Merci&nbsp;!</p>
@@ -192,6 +261,156 @@ async function onSubmit() {
                     </p>
                 </div>
 
+                <div
+                    v-else-if="declineStatus === 'success'"
+                    key="decline-success"
+                    class="mt-12 border border-gold/40 bg-[#fafaf7] p-10 text-center"
+                >
+                    <p class="font-display text-4xl text-gold">Merci&nbsp;!</p>
+                    <p class="mt-4 font-serif text-lg text-ink/80">
+                        Votre réponse a bien été enregistrée. Vous nous manquerez&nbsp;!
+                    </p>
+                </div>
+
+                <div v-else-if="!rsvpChoice" key="choice" class="mt-12">
+                    <div class="text-center">
+                        <p class="font-serif text-lg text-ink">Serez-vous des nôtres&nbsp;?</p>
+                        <div class="mt-6 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+                            <button
+                                v-for="option in [
+                                    { value: 'oui', label: 'Oui, avec plaisir' },
+                                    { value: 'non', label: 'Non, malheureusement' },
+                                ] as const"
+                                :key="option.value"
+                                type="button"
+                                class="w-full cursor-pointer border border-ink/20 px-6 py-3 font-sans text-xs uppercase tracking-widest text-ink/70 transition duration-150 ease-emph-out hover:border-gold hover:text-ink active:scale-[0.98] sm:w-auto sm:min-w-[12rem]"
+                                @click="rsvpChoice = option.value"
+                            >
+                                {{ option.label }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Decline form -->
+                <form
+                    v-else-if="rsvpChoice === 'non'"
+                    key="decline-form"
+                    class="mt-12 space-y-8"
+                    novalidate
+                    @submit.prevent="onDeclineSubmit"
+                >
+                    <div class="hidden" aria-hidden="true">
+                        <label>
+                            Ne pas remplir
+                            <input
+                                v-model="declineForm.website"
+                                type="text"
+                                name="website"
+                                tabindex="-1"
+                                autocomplete="off"
+                            />
+                        </label>
+                    </div>
+
+                    <p class="text-center font-serif text-base leading-relaxed text-ink/80">
+                        Je ne pourrai malheureusement pas être présent·e…
+                    </p>
+
+                    <div>
+                        <label class="eyebrow block" for="declineFullName">Nom et prénom *</label>
+                        <input
+                            id="declineFullName"
+                            v-model="declineForm.fullName"
+                            type="text"
+                            autocomplete="name"
+                            required
+                            class="mt-2 w-full border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink transition-colors duration-150 ease-out placeholder:text-ink/30 focus:border-gold focus:outline-none"
+                            :class="{ 'border-red-600': declineValidationErrors.fullName }"
+                        />
+                        <Transition name="error">
+                            <p v-if="declineValidationErrors.fullName" class="mt-1 text-sm text-red-700">
+                                {{ declineValidationErrors.fullName }}
+                            </p>
+                        </Transition>
+                    </div>
+
+                    <div>
+                        <label class="eyebrow block" for="declineMessage">Un petit mot pour les mariés</label>
+                        <textarea
+                            id="declineMessage"
+                            v-model="declineForm.message"
+                            rows="4"
+                            class="mt-2 w-full resize-none border-b border-ink/30 bg-transparent px-0 py-2 font-serif text-lg text-ink transition-colors duration-150 ease-out placeholder:text-ink/30 focus:border-gold focus:outline-none"
+                        ></textarea>
+                    </div>
+
+                    <Transition name="error">
+                        <p v-if="declineStatus === 'error'" class="text-center font-serif text-base text-red-700">
+                            {{ declineErrorMessage }}
+                        </p>
+                    </Transition>
+
+                    <div class="flex flex-col items-center gap-4 pt-4">
+                        <button
+                            type="submit"
+                            :disabled="isDeclineSubmitting"
+                            :aria-busy="isDeclineSubmitting"
+                            :class="[
+                                'submit-btn relative inline-flex min-w-[15rem] items-center justify-center overflow-hidden border border-gold bg-gold px-10 py-3 font-sans text-xs uppercase tracking-widest text-paper transition duration-200 ease-emph-out hover:bg-gold-dark active:scale-[0.98] disabled:cursor-progress disabled:active:scale-100',
+                                { 'is-submitting': isDeclineSubmitting },
+                            ]"
+                        >
+                            <Transition name="btn-swap" mode="out-in">
+                                <span
+                                    v-if="isDeclineSubmitting"
+                                    key="loading"
+                                    class="inline-flex items-center gap-2.5"
+                                    aria-live="polite"
+                                >
+                                    <svg class="spinner h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <circle
+                                            cx="12"
+                                            cy="12"
+                                            r="9"
+                                            stroke="currentColor"
+                                            stroke-opacity="0.3"
+                                            stroke-width="2.5"
+                                        />
+                                        <path
+                                            d="M21 12a9 9 0 0 0-9-9"
+                                            stroke="currentColor"
+                                            stroke-width="2.5"
+                                            stroke-linecap="round"
+                                        />
+                                    </svg>
+                                    <span>Envoi en cours</span>
+                                </span>
+                                <span v-else key="idle">Envoyer ma réponse</span>
+                            </Transition>
+                        </button>
+
+                        <button
+                            type="button"
+                            class="font-serif text-sm text-ink/50 underline transition-colors duration-150 hover:text-ink/80"
+                            @click="rsvpChoice = ''"
+                        >
+                            Retour
+                        </button>
+
+                        <Transition name="hint">
+                            <p
+                                v-if="showSlowMessage"
+                                class="mt-2 font-serif text-sm italic leading-relaxed text-ink/60"
+                                aria-live="polite"
+                            >
+                                Cela peut prendre quelques instants, merci de patienter…
+                            </p>
+                        </Transition>
+                    </div>
+                </form>
+
+                <!-- Accept form (existing) -->
                 <form v-else key="form" class="mt-12 space-y-8" novalidate @submit.prevent="onSubmit">
                     <!-- Honeypot -->
                     <div class="hidden" aria-hidden="true">
@@ -206,12 +425,10 @@ async function onSubmit() {
                             <p class="font-serif text-base text-ink">Je viens… *</p>
                             <div class="mt-3 flex gap-3">
                                 <label
-                                    v-for="option in (
-                                        [
-                                            { value: 'seul', label: 'Seul·e' },
-                                            { value: 'accompagne', label: 'Accompagné·e' },
-                                        ] as const
-                                    )"
+                                    v-for="option in [
+                                        { value: 'seul', label: 'Seul·e' },
+                                        { value: 'accompagne', label: 'Accompagné·e' },
+                                    ] as const"
                                     :key="option.value"
                                     class="flex-1 cursor-pointer border border-ink/20 px-4 py-3 text-center font-sans text-xs uppercase tracking-widest transition duration-150 ease-emph-out focus-within:border-gold focus-within:ring-1 focus-within:ring-gold/40 active:scale-[0.98]"
                                     :class="
@@ -258,9 +475,7 @@ async function onSubmit() {
 
                         <Transition name="reveal">
                             <div v-if="form.attendance === 'accompagne'" class="md:col-span-2">
-                                <label class="eyebrow block" for="plusOne">
-                                    Nom et prénom de l’accompagnant·e *
-                                </label>
+                                <label class="eyebrow block" for="plusOne"> Nom et prénom de l’accompagnant·e * </label>
                                 <input
                                     id="plusOne"
                                     v-model="form.plusOne"
