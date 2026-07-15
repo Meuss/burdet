@@ -10,7 +10,7 @@
 
             <div class="grid gap-12 md:grid-cols-3">
                 <article class="text-center">
-                    <p class="eyebrow">14h00</p>
+                    <p class="eyebrow">14h30</p>
                     <h3 class="mt-3 font-serif text-2xl font-light text-ink">Cérémonie religieuse</h3>
                     <div class="mt-4 font-serif text-base leading-relaxed text-ink/80">
                         <p>Église Saint-Jean</p>
