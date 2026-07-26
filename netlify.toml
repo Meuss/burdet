@@ -1,15 +1,11 @@
 [build]
     command = "pnpm generate"
     publish = ".output/public"
-    functions = "netlify/functions"
 
 [build.environment]
     NODE_VERSION = "24"
     PNPM_VERSION = "10"
     NPM_FLAGS = "--version" # prevent Netlify from running `npm install`; pnpm handled via corepack
-
-[functions]
-    node_bundler = "esbuild"
 
 [[headers]]
     for = "/*"

@@ -13,7 +13,7 @@ export default defineNuxtConfig({
     app: {
         head: {
             htmlAttrs: { lang: 'fr' },
-            title: 'Stéphanie & Jérémy — 18 juillet 2026',
+            title: 'Stéphanie & Jérémy — Merci !',
             meta: [
                 { charset: 'utf-8' },
                 { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -22,12 +22,12 @@ export default defineNuxtConfig({
                 {
                     name: 'description',
                     content:
-                        'Stéphanie et Jérémy se marient le 18 juillet 2026 à Fribourg. Retrouvez ici toutes les informations pratiques et confirmez votre présence.',
+                        'Stéphanie et Jérémy se sont mariés le 18 juillet 2026 à Fribourg. Merci à tous d’avoir partagé ce jour avec nous.',
                 },
-                { property: 'og:title', content: 'Stéphanie & Jérémy — 18 juillet 2026' },
+                { property: 'og:title', content: 'Stéphanie & Jérémy — Merci !' },
                 {
                     property: 'og:description',
-                    content: 'Mariage de Stéphanie et Jérémy le 18 juillet 2026 à Fribourg.',
+                    content: 'Merci d’avoir partagé notre mariage du 18 juillet 2026 à Fribourg.',
                 },
                 { property: 'og:type', content: 'website' },
                 { property: 'og:url', content: 'https://stephanie-jeremy.ch/' },
@@ -37,10 +37,10 @@ export default defineNuxtConfig({
                 { property: 'og:image:alt', content: 'Stéphanie & Jérémy — 18 juillet 2026 à Fribourg' },
                 { property: 'og:locale', content: 'fr_CH' },
                 { name: 'twitter:card', content: 'summary_large_image' },
-                { name: 'twitter:title', content: 'Stéphanie & Jérémy — 18 juillet 2026' },
+                { name: 'twitter:title', content: 'Stéphanie & Jérémy — Merci !' },
                 {
                     name: 'twitter:description',
-                    content: 'Mariage de Stéphanie et Jérémy le 18 juillet 2026 à Fribourg.',
+                    content: 'Merci d’avoir partagé notre mariage du 18 juillet 2026 à Fribourg.',
                 },
                 { name: 'twitter:image', content: 'https://stephanie-jeremy.ch/og-image.png' },
             ],
